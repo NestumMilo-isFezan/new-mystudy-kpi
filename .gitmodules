@@ -1,0 +1,4 @@
+[submodule "legacy-mystudy-kpi"]
+	path = legacy-mystudy-kpi
+	url = git@github.com:NestumMilo-isFezan/mystudy-kpi.git
+	branch = main
