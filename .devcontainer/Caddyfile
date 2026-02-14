@@ -1,0 +1,9 @@
+mystudykpi.test {
+    encode zstd gzip
+    tls internal
+
+    @api path /api*
+    reverse_proxy @api backend:8080
+
+    reverse_proxy frontend:4321
+}

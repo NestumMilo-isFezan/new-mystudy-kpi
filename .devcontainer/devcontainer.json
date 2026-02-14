@@ -1,0 +1,67 @@
+{
+  "name": "MyStudy KPI Fullstack",
+  "dockerComposeFile": [
+    "../compose.yaml",
+    "../compose.dev.yaml"
+  ],
+  "service": "backend",
+  "runServices": [
+    "db",
+    "backend",
+    "frontend",
+    "caddy"
+  ],
+  "workspaceFolder": "/workspace",
+  "shutdownAction": "stopCompose",
+  "updateRemoteUserUID": true,
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "bmewburn.vscode-intelephense-client",
+        "astro-build.astro-vscode",
+        "alpinejs.alpine-js-intellisense",
+        "ecmel.vscode-html-css",
+        "mikestead.dotenv",
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode"
+      ],
+      "settings": {
+        "files.eol": "\n",
+        "terminal.integrated.defaultProfile.linux": "bash"
+      }
+    }
+  },
+  "remoteUser": "root",
+  "forwardPorts": [
+    80,
+    443,
+    4321,
+    8080,
+    5433
+  ],
+  "portsAttributes": {
+    "80": {
+      "label": "HTTP"
+    },
+    "443": {
+      "label": "HTTPS"
+    },
+    "4321": {
+      "label": "Frontend"
+    },
+    "8080": {
+      "label": "Backend"
+    },
+    "5433": {
+      "label": "Postgres"
+    }
+  },
+  "features": {
+    "ghcr.io/devcontainers/features/common-utils:1": {},
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "20"
+    },
+    "ghcr.io/devcontainers/features/github-cli:1": {}
+  },
+  "postCreateCommand": "bash -lc 'corepack enable || true; npm i -g bun || true; if [ -f /workspace/mystudy-kpi-frontend/package.json ]; then cd /workspace/mystudy-kpi-frontend && bun install --frozen-lockfile || bun install; fi; if [ -f /workspace/mystudy-kpi-backend/composer.json ]; then cd /workspace/mystudy-kpi-backend && composer install; fi'"
+}

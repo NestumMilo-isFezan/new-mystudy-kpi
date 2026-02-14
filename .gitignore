@@ -1,0 +1,14 @@
+.DS_Store
+.idea/
+.vscode/
+
+# Root-level env and logs
+.env
+.env.*
+*.log
+
+# Common monorepo build/dependency artifacts
+**/node_modules/
+**/dist/
+**/.cache/
+**/coverage/

@@ -1,0 +1,39 @@
+services:
+  db:
+    ports:
+      - "5433:5432"
+
+  backend:
+    environment:
+      APP_ENV: dev
+      APP_DEBUG: 1
+    volumes:
+      - .:/workspace:cached # Explicitly mount root to /workspace
+      - ./mystudy-kpi-backend:/var/www/html
+    ports:
+      - "8080:8080"
+
+  frontend:
+    volumes:
+      - ./mystudy-kpi-frontend:/app
+      - /app/node_modules
+    ports:
+      - "4321:4321"
+    command: bun run dev --host
+
+  caddy:
+    image: caddy:2-alpine
+    depends_on:
+      - frontend
+      - backend
+    volumes:
+      - ./.devcontainer/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    ports:
+      - "80:80"
+      - "443:443"
+
+volumes:
+  caddy_data:
+  caddy_config:
