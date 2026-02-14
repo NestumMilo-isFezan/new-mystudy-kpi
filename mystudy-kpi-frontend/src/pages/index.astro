@@ -1,0 +1,56 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="My Study KPI - Dashboard">
+	<header>
+		<h1>My Study KPI</h1>
+		<nav>
+			<ul>
+				<li><a href="#">Home</a></li>
+				<li><a href="#">KPI Indicator</a></li>
+				<li><a href="#">Profile</a></li>
+			</ul>
+		</nav>
+	</header>
+
+	<section>
+		<h2>Welcome to your KPI Dashboard</h2>
+		<p>This is a modern refactor of the FKI MyStudy KPI system.</p>
+		
+		<div x-data="{ count: 0 }">
+			<button @click="count++">
+				Alpine.js Counter: <span x-text="count"></span>
+			</button>
+		</div>
+
+		<hr />
+
+		<h3>Sample Data Table (OAT UI Styles)</h3>
+		<table>
+			<thead>
+				<tr>
+					<th>Indicator</th>
+					<th>Aim</th>
+					<th>Actual</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>CGPA</td>
+					<td>3.50</td>
+					<td>3.65</td>
+				</tr>
+				<tr>
+					<td>Activities</td>
+					<td>5</td>
+					<td>3</td>
+				</tr>
+			</tbody>
+		</table>
+	</section>
+
+	<footer>
+		<p>&copy; 2026 FKI MyStudy KPI Refactor</p>
+	</footer>
+</BaseLayout>
