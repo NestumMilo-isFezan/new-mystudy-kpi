@@ -7,6 +7,9 @@ import { fileURLToPath, URL } from 'node:url'
 import tailwindcss from '@tailwindcss/vite'
 
 const config = defineConfig({
+  server: {
+    allowedHosts: ['mystudykpi.test'],
+  },
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),

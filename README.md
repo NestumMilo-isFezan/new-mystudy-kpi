@@ -1,14 +1,21 @@
-# New MyStudy KPI Monorepo
+# MyStudy KPI Monorepo
 
-This repository contains the modernized MyStudy KPI stack and the legacy app preserved as a Git submodule.
+This repository contains the modern MyStudy KPI platform and the legacy app preserved as a submodule.
+
+## Stack
+
+- Frontend: TanStack Start (`mystudy-kpi-frontend/`)
+- Backend: Symfony (`mystudy-kpi-backend/`)
+- Database: PostgreSQL
+- Legacy app: Git submodule (`legacy-mystudy-kpi/`)
 
 ## Repository Structure
 
-- `mystudy-kpi-frontend/` - Astro frontend
+- `mystudy-kpi-frontend/` - TanStack Start frontend
 - `mystudy-kpi-backend/` - Symfony backend
 - `legacy-mystudy-kpi/` - legacy PHP application (Git submodule)
-- `docs/` - plans, research, and implementation notes
-- `.devcontainer/` - local dev container configuration
+- `docs/` - plans and implementation notes
+- `.devcontainer/` - local development container setup
 
 ## Clone
 
@@ -18,51 +25,52 @@ Use recursive clone so the legacy submodule is fetched automatically:
 git clone --recurse-submodules git@github.com:NestumMilo-isFezan/new-mystudy-kpi.git
 ```
 
-If you already cloned without submodules:
+If already cloned without submodules:
 
 ```bash
 git submodule update --init --recursive
 ```
 
-## Submodule Notes
+## Run With Docker Compose (Dev)
 
-- `legacy-mystudy-kpi` tracks: `git@github.com:NestumMilo-isFezan/mystudy-kpi.git`
-- Submodule mapping is defined in `.gitmodules`
-- To pull latest submodule changes:
+From the repository root:
 
 ```bash
-git submodule update --remote --merge
+docker compose -f compose.yaml -f compose.dev.yaml up --build
 ```
 
-## Development
+Local endpoints:
 
-This repository is designed to run in the Devcontainer workflow.
+- Frontend app: `http://localhost:4321`
+- Backend API: `http://localhost:8080`
+- PostgreSQL: `localhost:5433`
+- HTTPS gateway (Caddy): `https://mystudykpi.test`
 
-- Open the repository in VS Code
+## Devcontainer Workflow
+
+- Open the repo in VS Code
 - Run `Dev Containers: Reopen in Container`
-- Wait until post-create setup finishes
-- Work inside the container for frontend and backend tasks
+- Wait for post-create setup
+- Develop frontend and backend inside the container
 
 ## Local HTTPS and Test Domain
 
-After opening in Devcontainer, use this quick setup:
-
-1. Add local domain mapping:
+1) Add local domain mapping:
 
 ```bash
 echo "127.0.0.1 mystudykpi.test" | sudo tee -a /etc/hosts
 ```
 
-2. Trust the local certificate file from this repo:
+2) Trust the local certificate:
 
-- Linux (Fedora/Bluefin):
+- Linux (Fedora/Bluefin)
 
 ```bash
 sudo install -m 0644 ./.devcontainer/mystudykpi-root.crt /etc/pki/ca-trust/source/anchors/mystudykpi-root.crt
 sudo update-ca-trust extract
 ```
 
-- Linux (Debian/Ubuntu):
+- Linux (Debian/Ubuntu)
 
 ```bash
 sudo install -m 0644 ./.devcontainer/mystudykpi-root.crt /usr/local/share/ca-certificates/mystudykpi-root.crt
@@ -71,25 +79,21 @@ sudo update-ca-certificates
 
 - macOS: import `.devcontainer/mystudykpi-root.crt` into Keychain Access and set it to `Always Trust`.
 
-3. Open and verify:
-
-- Frontend: `https://mystudykpi.test`
-- API: `https://mystudykpi.test/api`
-
-Optional CLI verify:
+3) Verify:
 
 ```bash
 curl -I https://mystudykpi.test
 curl -I https://mystudykpi.test/api
 ```
 
-If browser trust still fails, see `docs/finished-task/dev-https-ssl.md` for full troubleshooting notes.
+If browser trust still fails, see `docs/finished-task/dev-https-ssl.md`.
 
-## Basic Git Workflow
+## Submodule Notes
+
+- `legacy-mystudy-kpi` tracks `git@github.com:NestumMilo-isFezan/mystudy-kpi.git`
+- Mapping is defined in `.gitmodules`
+- Pull latest submodule changes:
 
 ```bash
-git checkout -b feature/your-change
-git add .
-git commit -m "feat: describe change"
-git push -u origin feature/your-change
+git submodule update --remote --merge
 ```
