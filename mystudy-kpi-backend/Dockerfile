@@ -17,7 +17,7 @@ COPY --chown=www-data:www-data bin/ bin/
 COPY --chown=www-data:www-data config/ config/
 COPY --chown=www-data:www-data src/ src/
 COPY --chown=www-data:www-data .env* ./
-RUN composer install --no-dev --no-interaction --no-progress --optimize-autoloader
+RUN APP_ENV=prod APP_DEBUG=0 composer install --no-dev --no-interaction --no-progress --optimize-autoloader
 
 # Stage 3: Production image
 FROM base
