@@ -1,30 +1,34 @@
-import { defineConfig } from 'vite'
-import { devtools } from '@tanstack/devtools-vite'
-import { tanstackStart } from '@tanstack/react-start/plugin/vite'
-import viteReact from '@vitejs/plugin-react'
-import viteTsConfigPaths from 'vite-tsconfig-paths'
-import { fileURLToPath, URL } from 'node:url'
-import tailwindcss from '@tailwindcss/vite'
+import { fileURLToPath, URL } from "node:url";
+import tailwindcss from "@tailwindcss/vite";
+import { devtools } from "@tanstack/devtools-vite";
+import { tanstackStart } from "@tanstack/react-start/plugin/vite";
+import viteReact from "@vitejs/plugin-react";
+import { defineConfig } from "vite";
+import viteTsConfigPaths from "vite-tsconfig-paths";
 
 const config = defineConfig({
-  server: {
-    allowedHosts: ['mystudykpi.test'],
-  },
-  resolve: {
-    alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url)),
-    },
-  },
-  plugins: [
-    devtools(),
-    // this is the plugin that enables path aliases
-    viteTsConfigPaths({
-      projects: ['./tsconfig.json'],
-    }),
-    tailwindcss(),
-    tanstackStart(),
-    viteReact(),
-  ],
-})
+	server: {
+		allowedHosts: ["mystudykpi.test"],
+	},
+	resolve: {
+		dedupe: ["react", "react-dom"],
+		alias: {
+			"@": fileURLToPath(new URL("./src", import.meta.url)),
+		},
+	},
+	optimizeDeps: {
+		include: ["react", "react-dom", "@tanstack/react-query"],
+	},
+	plugins: [
+		devtools(),
+		// this is the plugin that enables path aliases
+		viteTsConfigPaths({
+			projects: ["./tsconfig.json"],
+		}),
+		tailwindcss(),
+		tanstackStart(),
+		viteReact(),
+	],
+});
 
-export default config
+export default config;

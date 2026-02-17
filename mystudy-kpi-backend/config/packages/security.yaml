@@ -13,6 +13,10 @@ security:
             pattern: ^/(_profiler|_wdt|assets|build)/
             security: false
 
+        public_api:
+            pattern: ^/api/(login|register|intake-batches|logout)$
+            security: false
+
         main:
             stateless: true
             provider: app_user_provider
@@ -21,6 +25,7 @@ security:
     access_control:
         - { path: ^/api/login$, roles: PUBLIC_ACCESS }
         - { path: ^/api/register$, roles: PUBLIC_ACCESS }
+        - { path: ^/api/logout$, roles: PUBLIC_ACCESS }
         - { path: ^/api/intake-batches$, roles: PUBLIC_ACCESS }
         - { path: ^/api/admin, roles: ROLE_STAFF }
         - { path: ^/api, roles: IS_AUTHENTICATED_FULLY }

@@ -1,8 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Command;
 
 use App\Entity\User;
+use App\Enum\UserRole;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -70,7 +73,7 @@ class CreateStaffUserCommand extends Command
         $staffUser = (new User())
             ->setIdentifier($normalizedIdentifier)
             ->setEmail($normalizedEmail)
-            ->setRoleValue(User::ROLE_STAFF_VALUE);
+            ->setRole(UserRole::STAFF);
 
         $staffUser->setPassword($this->passwordHasher->hashPassword($staffUser, $plainPassword));
 

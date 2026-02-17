@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
+use App\Enum\UserRole;
 use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
@@ -14,14 +17,6 @@ use Symfony\Component\Uid\Uuid;
 #[ORM\UniqueConstraint(name: 'uniq_user_email', columns: ['email'])]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
-    public const int ROLE_STUDENT_VALUE = 0;
-    public const int ROLE_LECTURER_VALUE = 1;
-    public const int ROLE_STAFF_VALUE = 2;
-
-    public const string ROLE_STUDENT = 'ROLE_STUDENT';
-    public const string ROLE_LECTURER = 'ROLE_LECTURER';
-    public const string ROLE_STAFF = 'ROLE_STAFF';
-
     #[ORM\Id]
     #[ORM\Column(type: 'string', length: 36)]
     private string $id;
@@ -35,8 +30,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: 'string')]
     private string $password;
 
-    #[ORM\Column(type: 'smallint')]
-    private int $role = self::ROLE_STUDENT_VALUE;
+    #[ORM\Column(type: 'smallint', enumType: UserRole::class)]
+    private UserRole $role = UserRole::STUDENT;
 
     #[ORM\ManyToOne(targetEntity: IntakeBatch::class, inversedBy: 'students')]
     #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
@@ -96,17 +91,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getRoleValue(): int
+    public function getRole(): UserRole
     {
         return $this->role;
     }
 
-    public function setRoleValue(int $role): self
+    public function setRole(UserRole $role): self
     {
-        if (!\in_array($role, [self::ROLE_STUDENT_VALUE, self::ROLE_LECTURER_VALUE, self::ROLE_STAFF_VALUE], true)) {
-            throw new \InvalidArgumentException('Invalid role value provided.');
-        }
-
         $this->role = $role;
 
         return $this;
@@ -114,7 +105,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function getRoles(): array
     {
-        return [self::roleValueToRoleName($this->role)];
+        return [$this->role->label()];
     }
 
     public function eraseCredentials(): void
@@ -143,15 +134,5 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->profile = $profile;
 
         return $this;
-    }
-
-    public static function roleValueToRoleName(int $roleValue): string
-    {
-        return match ($roleValue) {
-            self::ROLE_STUDENT_VALUE => self::ROLE_STUDENT,
-            self::ROLE_LECTURER_VALUE => self::ROLE_LECTURER,
-            self::ROLE_STAFF_VALUE => self::ROLE_STAFF,
-            default => self::ROLE_STUDENT,
-        };
     }
 }

@@ -1,74 +1,92 @@
+import { TanStackDevtools } from "@tanstack/react-devtools";
+import type { QueryClient } from "@tanstack/react-query";
 import {
-  HeadContent,
-  Scripts,
-  createRootRouteWithContext,
-} from '@tanstack/react-router'
-import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
-import { TanStackDevtools } from '@tanstack/react-devtools'
+	createRootRouteWithContext,
+	HeadContent,
+	Scripts,
+	useRouterState,
+} from "@tanstack/react-router";
+import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
+import PublicLayout from "@/components/layouts/public-layout";
+import TanStackQueryDevtools from "../integrations/tanstack-query/devtools";
 
-import Header from '../components/Header'
-
-import TanStackQueryProvider from '../integrations/tanstack-query/root-provider'
-
-import TanStackQueryDevtools from '../integrations/tanstack-query/devtools'
-
-import appCss from '../styles.css?url'
-
-import type { QueryClient } from '@tanstack/react-query'
+import TanStackQueryProvider from "../integrations/tanstack-query/root-provider";
+import { getServerSession } from "../lib/auth/get-server-session";
+import { sessionQueryKey } from "../lib/auth/session-query";
+import appCss from "../styles.css?url";
 
 interface MyRouterContext {
-  queryClient: QueryClient
+	queryClient: QueryClient;
 }
 
 export const Route = createRootRouteWithContext<MyRouterContext>()({
-  head: () => ({
-    meta: [
-      {
-        charSet: 'utf-8',
-      },
-      {
-        name: 'viewport',
-        content: 'width=device-width, initial-scale=1',
-      },
-      {
-        title: 'TanStack Start Starter',
-      },
-    ],
-    links: [
-      {
-        rel: 'stylesheet',
-        href: appCss,
-      },
-    ],
-  }),
-  shellComponent: RootDocument,
-})
+	loader: async ({ context }) => {
+		const initialSession = await getServerSession();
+		context.queryClient.setQueryData(sessionQueryKey, initialSession);
+
+		return {
+			initialSession,
+		};
+	},
+	head: () => ({
+		meta: [
+			{
+				charSet: "utf-8",
+			},
+			{
+				name: "viewport",
+				content: "width=device-width, initial-scale=1",
+			},
+			{
+				title: "MyStudy KPI",
+			},
+		],
+		links: [
+			{
+				rel: "stylesheet",
+				href: appCss,
+			},
+		],
+	}),
+	shellComponent: RootDocument,
+});
 
 function RootDocument({ children }: { children: React.ReactNode }) {
-  return (
-    <html lang="en">
-      <head>
-        <HeadContent />
-      </head>
-      <body>
-        <TanStackQueryProvider>
-          <Header />
-          {children}
-          <TanStackDevtools
-            config={{
-              position: 'bottom-right',
-            }}
-            plugins={[
-              {
-                name: 'Tanstack Router',
-                render: <TanStackRouterDevtoolsPanel />,
-              },
-              TanStackQueryDevtools,
-            ]}
-          />
-        </TanStackQueryProvider>
-        <Scripts />
-      </body>
-    </html>
-  )
+	const { queryClient } = Route.useRouteContext();
+	const pathname = useRouterState({
+		select: (state) => state.location.pathname,
+	});
+	const showLandingHeader = pathname === "/";
+
+	return (
+		<html lang="en">
+			<head>
+				<HeadContent />
+			</head>
+			<body>
+				<TanStackQueryProvider queryClient={queryClient}>
+					{showLandingHeader ? (
+						<PublicLayout>{children}</PublicLayout>
+					) : (
+						children
+					)}
+					{import.meta.env.DEV ? (
+						<TanStackDevtools
+							config={{
+								position: "bottom-right",
+							}}
+							plugins={[
+								{
+									name: "Tanstack Router",
+									render: <TanStackRouterDevtoolsPanel />,
+								},
+								TanStackQueryDevtools,
+							]}
+						/>
+					) : null}
+				</TanStackQueryProvider>
+				<Scripts />
+			</body>
+		</html>
+	);
 }

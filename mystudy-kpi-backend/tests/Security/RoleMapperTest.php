@@ -1,8 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Tests\Security;
 
-use App\Entity\User;
+use App\Enum\UserRole;
 use App\Security\RoleMapper;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
@@ -14,21 +16,21 @@ final class RoleMapperTest extends TestCase
     {
         $mapper = new RoleMapper();
 
-        self::assertSame(User::ROLE_STUDENT, $mapper->toSymfonyRole(User::ROLE_STUDENT_VALUE));
+        self::assertSame(UserRole::STUDENT->label(), $mapper->toSymfonyRole(UserRole::STUDENT->value));
     }
 
     public function testMapsLecturerRole(): void
     {
         $mapper = new RoleMapper();
 
-        self::assertSame(User::ROLE_LECTURER, $mapper->toSymfonyRole(User::ROLE_LECTURER_VALUE));
+        self::assertSame(UserRole::LECTURER->label(), $mapper->toSymfonyRole(UserRole::LECTURER->value));
     }
 
     public function testMapsStaffRole(): void
     {
         $mapper = new RoleMapper();
 
-        self::assertSame(User::ROLE_STAFF, $mapper->toSymfonyRole(User::ROLE_STAFF_VALUE));
+        self::assertSame(UserRole::STAFF->label(), $mapper->toSymfonyRole(UserRole::STAFF->value));
     }
 
     public function testRejectsUnknownRoleValue(): void

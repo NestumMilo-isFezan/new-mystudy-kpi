@@ -1,8 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Tests\Controller;
 
 use App\Entity\User;
+use App\Enum\UserRole;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\SchemaTool;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
@@ -135,9 +138,23 @@ final class ProfileControllerTest extends WebTestCase
                 'birthDate' => '2999-01-01',
             ], JSON_THROW_ON_ERROR));
 
-        self::assertResponseStatusCodeSame(400);
+        self::assertResponseStatusCodeSame(422);
+    }
+
+    public function testRequiresNameFieldsWhenCreatingInitialProfile(): void
+    {
+        $client = $this->client;
+        $this->seedUser('STD004', 'student4@example.com', 'secret123');
+        $this->login($client, 'STD004', 'secret123');
+
+        $client->request('PUT', '/api/profile', [], [], ['CONTENT_TYPE' => 'application/json'], json_encode([
+                'bio' => 'Profile without names',
+            ], JSON_THROW_ON_ERROR));
+
+        self::assertResponseStatusCodeSame(422);
+
         $response = json_decode($client->getResponse()->getContent() ?: '', true, 512, JSON_THROW_ON_ERROR);
-        self::assertSame('birthDate cannot be in the future.', $response['message']);
+        self::assertSame('First name and last name are required for new profiles.', $response['message']);
     }
 
     private function login(KernelBrowser $client, string $identifier, string $password): void
@@ -158,7 +175,7 @@ final class ProfileControllerTest extends WebTestCase
         $user = (new User())
             ->setIdentifier($identifier)
             ->setEmail($email)
-            ->setRoleValue(User::ROLE_STUDENT_VALUE);
+            ->setRole(UserRole::STUDENT);
 
         $user->setPassword($hasher->hashPassword($user, $password));
 

@@ -1,39 +1,39 @@
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import type { ReactNode } from 'react'
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import type { ReactNode } from "react";
 
-let browserQueryClient: QueryClient | undefined
+let browserQueryClient: QueryClient | undefined;
 
 function createQueryClient() {
-  return new QueryClient()
+	return new QueryClient();
 }
 
 function getQueryClient() {
-  if (typeof window === 'undefined') {
-    return createQueryClient()
-  }
+	if (typeof window === "undefined") {
+		return createQueryClient();
+	}
 
-  if (!browserQueryClient) {
-    browserQueryClient = createQueryClient()
-  }
+	if (!browserQueryClient) {
+		browserQueryClient = createQueryClient();
+	}
 
-  return browserQueryClient
+	return browserQueryClient;
 }
 
 export function getContext() {
-  const queryClient = getQueryClient()
-  return {
-    queryClient,
-  }
+	const queryClient = getQueryClient();
+	return {
+		queryClient,
+	};
 }
 
 export default function TanStackQueryProvider({
-  children,
+	queryClient,
+	children,
 }: {
-  children: ReactNode
+	queryClient: QueryClient;
+	children: ReactNode;
 }) {
-  const queryClient = getQueryClient()
-
-  return (
-    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-  )
+	return (
+		<QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+	);
 }
