@@ -1,4 +1,4 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useRouterState } from "@tanstack/react-router";
 import { ChevronRight, type LucideIcon } from "lucide-react";
 
 import {
@@ -17,6 +17,14 @@ import {
 	SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
 
+function normalizePathname(pathname: string) {
+	if (pathname.length > 1 && pathname.endsWith("/")) {
+		return pathname.slice(0, -1);
+	}
+
+	return pathname;
+}
+
 export type NavMainItem = {
 	title: string;
 	url: string;
@@ -29,17 +37,29 @@ export type NavMainItem = {
 };
 
 export function NavMain({ items }: { items: NavMainItem[] }) {
+	const pathname = useRouterState({
+		select: (state) => state.location.pathname,
+	});
+	const normalizedPathname = normalizePathname(pathname);
+
 	return (
 		<SidebarGroup>
 			<SidebarGroupLabel>Navigation</SidebarGroupLabel>
 			<SidebarMenu>
 				{items.map((item) => {
 					const hasChildren = Boolean(item.items?.length);
+					const isItemActive =
+						normalizedPathname === normalizePathname(item.url) ||
+						item.items?.some(
+							(subItem) =>
+								normalizedPathname === normalizePathname(subItem.url),
+						);
 
 					if (!hasChildren) {
 						return (
 							<SidebarMenuItem key={item.title}>
 								<SidebarMenuButton
+									isActive={normalizedPathname === normalizePathname(item.url)}
 									render={
 										<Link to={item.url}>
 											{item.icon ? (
@@ -56,13 +76,13 @@ export function NavMain({ items }: { items: NavMainItem[] }) {
 					return (
 						<Collapsible
 							key={item.title}
-							defaultOpen={item.isActive}
+							defaultOpen={isItemActive}
 							className="group/collapsible"
 						>
 							<SidebarMenuItem>
 								<CollapsibleTrigger
 									render={
-										<SidebarMenuButton>
+										<SidebarMenuButton tooltip={item.title}>
 											{item.icon ? (
 												<item.icon className="transition-[color,transform] duration-200 ease-linear" />
 											) : null}
@@ -76,6 +96,10 @@ export function NavMain({ items }: { items: NavMainItem[] }) {
 										{item.items?.map((subItem) => (
 											<SidebarMenuSubItem key={subItem.title}>
 												<SidebarMenuSubButton
+													isActive={
+														normalizedPathname ===
+														normalizePathname(subItem.url)
+													}
 													render={
 														<Link to={subItem.url}>
 															<span>{subItem.title}</span>

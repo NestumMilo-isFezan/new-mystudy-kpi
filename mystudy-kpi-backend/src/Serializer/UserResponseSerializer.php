@@ -24,8 +24,8 @@ final class UserResponseSerializer
             'id' => $user->getId(),
             'identifier' => $user->getIdentifier(),
             'email' => $user->getEmail(),
-            'firstName' => $user->getProfile()?->getFirstName(),
-            'lastName' => $user->getProfile()?->getLastName(),
+            'firstName' => $user->getProfile()?->getFirstName() ?? '',
+            'lastName' => $user->getProfile()?->getLastName() ?? '',
             'role' => $user->getRole()->value,
             'intake' => $intake,
         ];

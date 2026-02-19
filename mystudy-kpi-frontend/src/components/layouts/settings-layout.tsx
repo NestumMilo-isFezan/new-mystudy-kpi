@@ -22,6 +22,14 @@ const settingsNavItems = [
 	},
 ];
 
+function normalizePathname(pathname: string) {
+	if (pathname.length > 1 && pathname.endsWith("/")) {
+		return pathname.slice(0, -1);
+	}
+
+	return pathname;
+}
+
 export default function SettingsLayout({
 	children,
 }: {
@@ -30,10 +38,12 @@ export default function SettingsLayout({
 	const pathname = useRouterState({
 		select: (state) => state.location.pathname,
 	});
+	const normalizedPathname = normalizePathname(pathname);
 
 	const activeItem =
-		settingsNavItems.find((item) => pathname === item.href) ||
-		settingsNavItems[0];
+		settingsNavItems.find(
+			(item) => normalizedPathname === normalizePathname(item.href),
+		) || settingsNavItems[0];
 
 	return (
 		<div className="flex flex-col gap-8 py-6">
@@ -56,7 +66,8 @@ export default function SettingsLayout({
 									to={item.href}
 									className={cn(
 										"w-full cursor-pointer",
-										pathname === item.href && "bg-accent",
+										normalizedPathname === normalizePathname(item.href) &&
+											"bg-accent",
 									)}
 								>
 									<item.icon className="mr-2 size-4" />
@@ -78,7 +89,7 @@ export default function SettingsLayout({
 								to={item.href}
 								className={cn(
 									"flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors hover:bg-accent",
-									pathname === item.href
+									normalizedPathname === normalizePathname(item.href)
 										? "bg-accent text-accent-foreground"
 										: "text-muted-foreground",
 								)}

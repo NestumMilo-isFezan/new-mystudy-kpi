@@ -1,7 +1,9 @@
 import {
 	type ColumnDef,
 	type ColumnFiltersState,
+	type ExpandedState,
 	getCoreRowModel,
+	getExpandedRowModel,
 	getFilteredRowModel,
 	getSortedRowModel,
 	type SortingState,
@@ -63,6 +65,7 @@ export function useTableControl<TData>({
 	const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
 	const [columnVisibility, setColumnVisibility] =
 		useState<VisibilityState>(defaultVisibility);
+	const [expanded, setExpanded] = useState<ExpandedState>({});
 
 	useEffect(() => {
 		setColumnVisibility(buildDefaultVisibility(config));
@@ -80,6 +83,7 @@ export function useTableControl<TData>({
 			sorting,
 			columnFilters,
 			columnVisibility,
+			expanded,
 		},
 		onGlobalFilterChange: setQuery,
 		onSortingChange: (updater) => {
@@ -96,6 +100,7 @@ export function useTableControl<TData>({
 		},
 		onColumnFiltersChange: setColumnFilters,
 		onColumnVisibilityChange: setColumnVisibility,
+		onExpandedChange: setExpanded,
 		globalFilterFn: (row, _columnId, filterValueRaw) => {
 			const normalizedFilter = String(filterValueRaw ?? "")
 				.trim()
@@ -126,6 +131,7 @@ export function useTableControl<TData>({
 		getCoreRowModel: getCoreRowModel(),
 		getFilteredRowModel: getFilteredRowModel(),
 		getSortedRowModel: getSortedRowModel(),
+		getExpandedRowModel: getExpandedRowModel(),
 		enableMultiSort: false,
 	});
 

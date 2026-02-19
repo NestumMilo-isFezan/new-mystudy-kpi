@@ -7,6 +7,7 @@ import {
 } from "@tanstack/react-router";
 
 import AuthLayout from "@/components/layouts/auth-layout";
+import { isApiError } from "@/lib/api/http-client";
 import { sessionQueryOptions } from "@/lib/auth/session-query";
 
 export const Route = createFileRoute("/_auth")({
@@ -25,7 +26,17 @@ export const Route = createFileRoute("/_auth")({
 });
 
 function isSessionOutageError(error: unknown): boolean {
-	return error instanceof Error && error.message === "Unable to load session.";
+	if (isApiError(error)) {
+		return error.status === 0 || error.status === 503;
+	}
+
+	return (
+		error instanceof Error &&
+		(error.message === "Unable to load session." ||
+			error.message.includes("fetch") ||
+			error.message.includes("NetworkError") ||
+			error.message.includes("ECONNREFUSED"))
+	);
 }
 
 function AuthSessionErrorComponent({ error }: { error: unknown }) {

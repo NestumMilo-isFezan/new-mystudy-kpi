@@ -9,6 +9,17 @@ import { useModal } from "@/hooks/use-modal";
 import type { UserProfile } from "@/lib/api/profile.functions";
 import { useSaveProfileMutation } from "@/lib/auth/session-query";
 
+function normalizeDateInputValue(value: string | null | undefined) {
+	if (!value) {
+		return "";
+	}
+
+	const [datePart] = value.split("T");
+	const isDateLike = /^\d{4}-\d{2}-\d{2}$/.test(datePart);
+
+	return isDateLike ? datePart : "";
+}
+
 export function ProfileForm({ profile }: { profile: UserProfile | null }) {
 	const saveProfileMutation = useSaveProfileMutation();
 	const modal = useModal();
@@ -18,7 +29,7 @@ export function ProfileForm({ profile }: { profile: UserProfile | null }) {
 			firstName: profile?.firstName ?? "",
 			lastName: profile?.lastName ?? "",
 			bio: profile?.bio ?? "",
-			birthDate: profile?.birthDate ?? "",
+			birthDate: normalizeDateInputValue(profile?.birthDate),
 			birthPlace: profile?.birthPlace ?? "",
 		},
 		onSubmit: async ({ value }) => {

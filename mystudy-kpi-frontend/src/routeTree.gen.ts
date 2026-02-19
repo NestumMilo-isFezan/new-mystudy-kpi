@@ -21,13 +21,15 @@ import { Route as AuthStaffRouteRouteImport } from './routes/_auth/_staff/route'
 import { Route as AuthLecturerRouteRouteImport } from './routes/_auth/_lecturer/route'
 import { Route as AuthSettingsUserSessionsRouteImport } from './routes/_auth/settings/user-sessions'
 import { Route as AuthSettingsProfileRouteImport } from './routes/_auth/settings/profile'
+import { Route as AuthLecturerMentorshipRouteRouteImport } from './routes/_auth/_lecturer/mentorship/route'
+import { Route as AuthLecturerMentorshipIndexRouteImport } from './routes/_auth/_lecturer/mentorship/index'
 import { Route as AuthStudentKpiOverviewRouteImport } from './routes/_auth/_student/kpi/overview'
 import { Route as AuthStudentKpiChallengesRouteImport } from './routes/_auth/_student/kpi/challenges'
 import { Route as AuthStaffStaffManageStudentsRouteImport } from './routes/_auth/_staff/staff/manage-students'
 import { Route as AuthStaffStaffManageLecturersRouteImport } from './routes/_auth/_staff/staff/manage-lecturers'
 import { Route as AuthStaffStaffIntakesRouteImport } from './routes/_auth/_staff/staff/intakes'
-import { Route as AuthLecturerMentorshipsStudentsRouteImport } from './routes/_auth/_lecturer/mentorships/students'
-import { Route as AuthLecturerMentorshipsDashboardRouteImport } from './routes/_auth/_lecturer/mentorships/dashboard'
+import { Route as AuthLecturerMentorshipAssignRouteImport } from './routes/_auth/_lecturer/mentorship/assign'
+import { Route as AuthLecturerMentorshipMentorshipIdRouteImport } from './routes/_auth/_lecturer/mentorship/$mentorshipId'
 import { Route as AuthStudentKpiTargetRouteRouteImport } from './routes/_auth/_student/kpi/target/route'
 import { Route as AuthStudentKpiRecordsRouteRouteImport } from './routes/_auth/_student/kpi/records/route'
 import { Route as AuthStudentKpiAcademicsRouteRouteImport } from './routes/_auth/_student/kpi/academics/route'
@@ -94,6 +96,18 @@ const AuthSettingsProfileRoute = AuthSettingsProfileRouteImport.update({
   path: '/profile',
   getParentRoute: () => AuthSettingsRouteRoute,
 } as any)
+const AuthLecturerMentorshipRouteRoute =
+  AuthLecturerMentorshipRouteRouteImport.update({
+    id: '/mentorship',
+    path: '/mentorship',
+    getParentRoute: () => AuthLecturerRouteRoute,
+  } as any)
+const AuthLecturerMentorshipIndexRoute =
+  AuthLecturerMentorshipIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthLecturerMentorshipRouteRoute,
+  } as any)
 const AuthStudentKpiOverviewRoute = AuthStudentKpiOverviewRouteImport.update({
   id: '/kpi/overview',
   path: '/kpi/overview',
@@ -122,17 +136,17 @@ const AuthStaffStaffIntakesRoute = AuthStaffStaffIntakesRouteImport.update({
   path: '/staff/intakes',
   getParentRoute: () => AuthStaffRouteRoute,
 } as any)
-const AuthLecturerMentorshipsStudentsRoute =
-  AuthLecturerMentorshipsStudentsRouteImport.update({
-    id: '/mentorships/students',
-    path: '/mentorships/students',
-    getParentRoute: () => AuthLecturerRouteRoute,
+const AuthLecturerMentorshipAssignRoute =
+  AuthLecturerMentorshipAssignRouteImport.update({
+    id: '/assign',
+    path: '/assign',
+    getParentRoute: () => AuthLecturerMentorshipRouteRoute,
   } as any)
-const AuthLecturerMentorshipsDashboardRoute =
-  AuthLecturerMentorshipsDashboardRouteImport.update({
-    id: '/mentorships/dashboard',
-    path: '/mentorships/dashboard',
-    getParentRoute: () => AuthLecturerRouteRoute,
+const AuthLecturerMentorshipMentorshipIdRoute =
+  AuthLecturerMentorshipMentorshipIdRouteImport.update({
+    id: '/$mentorshipId',
+    path: '/$mentorshipId',
+    getParentRoute: () => AuthLecturerMentorshipRouteRoute,
   } as any)
 const AuthStudentKpiTargetRouteRoute =
   AuthStudentKpiTargetRouteRouteImport.update({
@@ -195,18 +209,20 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof AuthDashboardRoute
   '/login': typeof PublicLoginRoute
   '/register': typeof PublicRegisterRoute
+  '/mentorship': typeof AuthLecturerMentorshipRouteRouteWithChildren
   '/settings/profile': typeof AuthSettingsProfileRoute
   '/settings/user-sessions': typeof AuthSettingsUserSessionsRoute
   '/kpi/academics': typeof AuthStudentKpiAcademicsRouteRouteWithChildren
   '/kpi/records': typeof AuthStudentKpiRecordsRouteRouteWithChildren
   '/kpi/target': typeof AuthStudentKpiTargetRouteRouteWithChildren
-  '/mentorships/dashboard': typeof AuthLecturerMentorshipsDashboardRoute
-  '/mentorships/students': typeof AuthLecturerMentorshipsStudentsRoute
+  '/mentorship/$mentorshipId': typeof AuthLecturerMentorshipMentorshipIdRoute
+  '/mentorship/assign': typeof AuthLecturerMentorshipAssignRoute
   '/staff/intakes': typeof AuthStaffStaffIntakesRoute
   '/staff/manage-lecturers': typeof AuthStaffStaffManageLecturersRoute
   '/staff/manage-students': typeof AuthStaffStaffManageStudentsRoute
   '/kpi/challenges': typeof AuthStudentKpiChallengesRoute
   '/kpi/overview': typeof AuthStudentKpiOverviewRoute
+  '/mentorship/': typeof AuthLecturerMentorshipIndexRoute
   '/kpi/academics/analytics': typeof AuthStudentKpiAcademicsAnalyticsRoute
   '/kpi/records/analytics': typeof AuthStudentKpiRecordsAnalyticsRoute
   '/kpi/target/edit': typeof AuthStudentKpiTargetEditRoute
@@ -222,13 +238,14 @@ export interface FileRoutesByTo {
   '/register': typeof PublicRegisterRoute
   '/settings/profile': typeof AuthSettingsProfileRoute
   '/settings/user-sessions': typeof AuthSettingsUserSessionsRoute
-  '/mentorships/dashboard': typeof AuthLecturerMentorshipsDashboardRoute
-  '/mentorships/students': typeof AuthLecturerMentorshipsStudentsRoute
+  '/mentorship/$mentorshipId': typeof AuthLecturerMentorshipMentorshipIdRoute
+  '/mentorship/assign': typeof AuthLecturerMentorshipAssignRoute
   '/staff/intakes': typeof AuthStaffStaffIntakesRoute
   '/staff/manage-lecturers': typeof AuthStaffStaffManageLecturersRoute
   '/staff/manage-students': typeof AuthStaffStaffManageStudentsRoute
   '/kpi/challenges': typeof AuthStudentKpiChallengesRoute
   '/kpi/overview': typeof AuthStudentKpiOverviewRoute
+  '/mentorship': typeof AuthLecturerMentorshipIndexRoute
   '/kpi/academics/analytics': typeof AuthStudentKpiAcademicsAnalyticsRoute
   '/kpi/records/analytics': typeof AuthStudentKpiRecordsAnalyticsRoute
   '/kpi/target/edit': typeof AuthStudentKpiTargetEditRoute
@@ -248,18 +265,20 @@ export interface FileRoutesById {
   '/_auth/dashboard': typeof AuthDashboardRoute
   '/_public/login': typeof PublicLoginRoute
   '/_public/register': typeof PublicRegisterRoute
+  '/_auth/_lecturer/mentorship': typeof AuthLecturerMentorshipRouteRouteWithChildren
   '/_auth/settings/profile': typeof AuthSettingsProfileRoute
   '/_auth/settings/user-sessions': typeof AuthSettingsUserSessionsRoute
   '/_auth/_student/kpi/academics': typeof AuthStudentKpiAcademicsRouteRouteWithChildren
   '/_auth/_student/kpi/records': typeof AuthStudentKpiRecordsRouteRouteWithChildren
   '/_auth/_student/kpi/target': typeof AuthStudentKpiTargetRouteRouteWithChildren
-  '/_auth/_lecturer/mentorships/dashboard': typeof AuthLecturerMentorshipsDashboardRoute
-  '/_auth/_lecturer/mentorships/students': typeof AuthLecturerMentorshipsStudentsRoute
+  '/_auth/_lecturer/mentorship/$mentorshipId': typeof AuthLecturerMentorshipMentorshipIdRoute
+  '/_auth/_lecturer/mentorship/assign': typeof AuthLecturerMentorshipAssignRoute
   '/_auth/_staff/staff/intakes': typeof AuthStaffStaffIntakesRoute
   '/_auth/_staff/staff/manage-lecturers': typeof AuthStaffStaffManageLecturersRoute
   '/_auth/_staff/staff/manage-students': typeof AuthStaffStaffManageStudentsRoute
   '/_auth/_student/kpi/challenges': typeof AuthStudentKpiChallengesRoute
   '/_auth/_student/kpi/overview': typeof AuthStudentKpiOverviewRoute
+  '/_auth/_lecturer/mentorship/': typeof AuthLecturerMentorshipIndexRoute
   '/_auth/_student/kpi/academics/analytics': typeof AuthStudentKpiAcademicsAnalyticsRoute
   '/_auth/_student/kpi/records/analytics': typeof AuthStudentKpiRecordsAnalyticsRoute
   '/_auth/_student/kpi/target/edit': typeof AuthStudentKpiTargetEditRoute
@@ -275,18 +294,20 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/login'
     | '/register'
+    | '/mentorship'
     | '/settings/profile'
     | '/settings/user-sessions'
     | '/kpi/academics'
     | '/kpi/records'
     | '/kpi/target'
-    | '/mentorships/dashboard'
-    | '/mentorships/students'
+    | '/mentorship/$mentorshipId'
+    | '/mentorship/assign'
     | '/staff/intakes'
     | '/staff/manage-lecturers'
     | '/staff/manage-students'
     | '/kpi/challenges'
     | '/kpi/overview'
+    | '/mentorship/'
     | '/kpi/academics/analytics'
     | '/kpi/records/analytics'
     | '/kpi/target/edit'
@@ -302,13 +323,14 @@ export interface FileRouteTypes {
     | '/register'
     | '/settings/profile'
     | '/settings/user-sessions'
-    | '/mentorships/dashboard'
-    | '/mentorships/students'
+    | '/mentorship/$mentorshipId'
+    | '/mentorship/assign'
     | '/staff/intakes'
     | '/staff/manage-lecturers'
     | '/staff/manage-students'
     | '/kpi/challenges'
     | '/kpi/overview'
+    | '/mentorship'
     | '/kpi/academics/analytics'
     | '/kpi/records/analytics'
     | '/kpi/target/edit'
@@ -327,18 +349,20 @@ export interface FileRouteTypes {
     | '/_auth/dashboard'
     | '/_public/login'
     | '/_public/register'
+    | '/_auth/_lecturer/mentorship'
     | '/_auth/settings/profile'
     | '/_auth/settings/user-sessions'
     | '/_auth/_student/kpi/academics'
     | '/_auth/_student/kpi/records'
     | '/_auth/_student/kpi/target'
-    | '/_auth/_lecturer/mentorships/dashboard'
-    | '/_auth/_lecturer/mentorships/students'
+    | '/_auth/_lecturer/mentorship/$mentorshipId'
+    | '/_auth/_lecturer/mentorship/assign'
     | '/_auth/_staff/staff/intakes'
     | '/_auth/_staff/staff/manage-lecturers'
     | '/_auth/_staff/staff/manage-students'
     | '/_auth/_student/kpi/challenges'
     | '/_auth/_student/kpi/overview'
+    | '/_auth/_lecturer/mentorship/'
     | '/_auth/_student/kpi/academics/analytics'
     | '/_auth/_student/kpi/records/analytics'
     | '/_auth/_student/kpi/target/edit'
@@ -439,6 +463,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthSettingsProfileRouteImport
       parentRoute: typeof AuthSettingsRouteRoute
     }
+    '/_auth/_lecturer/mentorship': {
+      id: '/_auth/_lecturer/mentorship'
+      path: '/mentorship'
+      fullPath: '/mentorship'
+      preLoaderRoute: typeof AuthLecturerMentorshipRouteRouteImport
+      parentRoute: typeof AuthLecturerRouteRoute
+    }
+    '/_auth/_lecturer/mentorship/': {
+      id: '/_auth/_lecturer/mentorship/'
+      path: '/'
+      fullPath: '/mentorship/'
+      preLoaderRoute: typeof AuthLecturerMentorshipIndexRouteImport
+      parentRoute: typeof AuthLecturerMentorshipRouteRoute
+    }
     '/_auth/_student/kpi/overview': {
       id: '/_auth/_student/kpi/overview'
       path: '/kpi/overview'
@@ -474,19 +512,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthStaffStaffIntakesRouteImport
       parentRoute: typeof AuthStaffRouteRoute
     }
-    '/_auth/_lecturer/mentorships/students': {
-      id: '/_auth/_lecturer/mentorships/students'
-      path: '/mentorships/students'
-      fullPath: '/mentorships/students'
-      preLoaderRoute: typeof AuthLecturerMentorshipsStudentsRouteImport
-      parentRoute: typeof AuthLecturerRouteRoute
+    '/_auth/_lecturer/mentorship/assign': {
+      id: '/_auth/_lecturer/mentorship/assign'
+      path: '/assign'
+      fullPath: '/mentorship/assign'
+      preLoaderRoute: typeof AuthLecturerMentorshipAssignRouteImport
+      parentRoute: typeof AuthLecturerMentorshipRouteRoute
     }
-    '/_auth/_lecturer/mentorships/dashboard': {
-      id: '/_auth/_lecturer/mentorships/dashboard'
-      path: '/mentorships/dashboard'
-      fullPath: '/mentorships/dashboard'
-      preLoaderRoute: typeof AuthLecturerMentorshipsDashboardRouteImport
-      parentRoute: typeof AuthLecturerRouteRoute
+    '/_auth/_lecturer/mentorship/$mentorshipId': {
+      id: '/_auth/_lecturer/mentorship/$mentorshipId'
+      path: '/$mentorshipId'
+      fullPath: '/mentorship/$mentorshipId'
+      preLoaderRoute: typeof AuthLecturerMentorshipMentorshipIdRouteImport
+      parentRoute: typeof AuthLecturerMentorshipRouteRoute
     }
     '/_auth/_student/kpi/target': {
       id: '/_auth/_student/kpi/target'
@@ -554,14 +592,32 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AuthLecturerMentorshipRouteRouteChildren {
+  AuthLecturerMentorshipMentorshipIdRoute: typeof AuthLecturerMentorshipMentorshipIdRoute
+  AuthLecturerMentorshipAssignRoute: typeof AuthLecturerMentorshipAssignRoute
+  AuthLecturerMentorshipIndexRoute: typeof AuthLecturerMentorshipIndexRoute
+}
+
+const AuthLecturerMentorshipRouteRouteChildren: AuthLecturerMentorshipRouteRouteChildren =
+  {
+    AuthLecturerMentorshipMentorshipIdRoute:
+      AuthLecturerMentorshipMentorshipIdRoute,
+    AuthLecturerMentorshipAssignRoute: AuthLecturerMentorshipAssignRoute,
+    AuthLecturerMentorshipIndexRoute: AuthLecturerMentorshipIndexRoute,
+  }
+
+const AuthLecturerMentorshipRouteRouteWithChildren =
+  AuthLecturerMentorshipRouteRoute._addFileChildren(
+    AuthLecturerMentorshipRouteRouteChildren,
+  )
+
 interface AuthLecturerRouteRouteChildren {
-  AuthLecturerMentorshipsDashboardRoute: typeof AuthLecturerMentorshipsDashboardRoute
-  AuthLecturerMentorshipsStudentsRoute: typeof AuthLecturerMentorshipsStudentsRoute
+  AuthLecturerMentorshipRouteRoute: typeof AuthLecturerMentorshipRouteRouteWithChildren
 }
 
 const AuthLecturerRouteRouteChildren: AuthLecturerRouteRouteChildren = {
-  AuthLecturerMentorshipsDashboardRoute: AuthLecturerMentorshipsDashboardRoute,
-  AuthLecturerMentorshipsStudentsRoute: AuthLecturerMentorshipsStudentsRoute,
+  AuthLecturerMentorshipRouteRoute:
+    AuthLecturerMentorshipRouteRouteWithChildren,
 }
 
 const AuthLecturerRouteRouteWithChildren =

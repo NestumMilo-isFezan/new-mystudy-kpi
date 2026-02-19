@@ -31,9 +31,17 @@ const breadcrumbPageMap: Record<string, string> = {
 	"/kpi/target": "Manage KPI Target",
 	"/kpi/target/edit": "Edit KPI Target",
 	"/kpi/challenges": "Manage Challenges",
-	"/mentorships/dashboard": "Mentorship Dashboard",
-	"/mentorships/students": "My Students",
+	"/mentorship/manage-student": "Manage Mentees",
+	"/mentorship/assign-student": "Assign Students",
 };
+
+function normalizePathname(pathname: string) {
+	if (pathname.length > 1 && pathname.endsWith("/")) {
+		return pathname.slice(0, -1);
+	}
+
+	return pathname;
+}
 
 const authRouteApi = getRouteApi("/_auth");
 
@@ -45,9 +53,10 @@ export default function AuthLayout({
 	const pathname = useRouterState({
 		select: (state) => state.location.pathname,
 	});
+	const normalizedPathname = normalizePathname(pathname);
 	const { session } = authRouteApi.useRouteContext();
 
-	const currentPage = breadcrumbPageMap[pathname] ?? "Workspace";
+	const currentPage = breadcrumbPageMap[normalizedPathname] ?? "Workspace";
 
 	return (
 		<SidebarProvider className="bg-muted/50">

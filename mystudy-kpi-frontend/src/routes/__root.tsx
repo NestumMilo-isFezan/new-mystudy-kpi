@@ -68,7 +68,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 	const showLandingHeader = isMounted && pathname === "/";
 
 	return (
-		<html lang="en">
+		<html lang="en" suppressHydrationWarning>
 			<head>
 				<HeadContent />
 			</head>

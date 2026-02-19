@@ -57,7 +57,7 @@ export const getProfileFn = createServerFn({ method: "GET" }).handler(
 			if (error instanceof Error && error.message.includes("401")) {
 				return null;
 			}
-			throw error;
+			throw new Error("Unable to load session.");
 		}
 	},
 );

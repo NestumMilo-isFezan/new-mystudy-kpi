@@ -28,7 +28,7 @@ const navMainItems: NavMainItemWithRoles[] = [
 		title: "Manage KPI",
 		url: "/kpi/overview",
 		icon: ChartBar,
-		roles: ["student", "lecturer", "staff"],
+		roles: ["student"],
 		items: [
 			{ title: "Overview", url: "/kpi/overview" },
 			{ title: "Manage Academics", url: "/kpi/academics" },
@@ -39,13 +39,9 @@ const navMainItems: NavMainItemWithRoles[] = [
 	},
 	{
 		title: "Mentorships",
-		url: "/mentorships/dashboard",
+		url: "/mentorship",
 		icon: UsersRound,
 		roles: ["lecturer", "staff"],
-		items: [
-			{ title: "Dashboard", url: "/mentorships/dashboard" },
-			{ title: "Manage Students", url: "/mentorships/students" },
-		],
 	},
 	{
 		title: "Staff Utilities",

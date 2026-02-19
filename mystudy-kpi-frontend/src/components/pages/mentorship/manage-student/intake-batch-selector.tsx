@@ -15,12 +15,14 @@ type IntakeBatchSelectorProps = {
 	value: number | string;
 	onChange: (value: number) => void;
 	source?: "all" | "active";
+	disabled?: boolean;
 };
 
 export function IntakeBatchSelector({
 	value,
 	onChange,
 	source = "all",
+	disabled = false,
 }: IntakeBatchSelectorProps) {
 	const { data: batches } = useSuspenseQuery(
 		source === "active"
@@ -32,7 +34,11 @@ export function IntakeBatchSelector({
 	const selectedBatch = batches.find((b) => b.id.toString() === stringValue);
 
 	return (
-		<Select value={stringValue} onValueChange={(val) => onChange(Number(val))}>
+		<Select
+			value={stringValue}
+			onValueChange={(val) => onChange(Number(val))}
+			disabled={disabled}
+		>
 			<SelectTrigger className="w-full">
 				<SelectValue placeholder="Select Intake Batch">
 					{selectedBatch

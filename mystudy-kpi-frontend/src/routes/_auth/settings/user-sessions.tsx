@@ -1,6 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { ShieldAlert, ShieldCheck } from "lucide-react";
-import { Suspense } from "react";
 import { ConfirmationModalContent } from "@/components/modal/confirmation-modal";
 import { SessionList } from "@/components/pages/settings/user-session/session-list";
 import { Button } from "@/components/ui/button";
@@ -87,16 +86,7 @@ function UserSessionsPage() {
 					</h3>
 				</div>
 
-				<Suspense
-					fallback={
-						<div className="space-y-3">
-							<div className="h-20 bg-muted/50 rounded-xl animate-pulse" />
-							<div className="h-20 bg-muted/50 rounded-xl animate-pulse" />
-						</div>
-					}
-				>
-					<SessionList />
-				</Suspense>
+				<SessionList />
 			</div>
 		</div>
 	);

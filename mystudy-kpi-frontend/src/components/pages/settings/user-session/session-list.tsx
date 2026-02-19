@@ -14,12 +14,6 @@ export function SessionList() {
 	const revokeMutation = useRevokeSessionMutation();
 	const modal = useModal();
 
-	// Hydration fix: only render relative time on the client
-	const [isMounted, setIsMounted] = useState(false);
-	useEffect(() => {
-		setIsMounted(true);
-	}, []);
-
 	const getDeviceIcon = (userAgent: string | null) => {
 		if (!userAgent) return <Globe className="h-5 w-5" />;
 		const ua = userAgent.toLowerCase();
@@ -62,15 +56,6 @@ export function SessionList() {
 		return `${browser} on ${os}`;
 	};
 
-	if (!isMounted) {
-		return (
-			<div className="space-y-3">
-				<div className="h-20 bg-muted/50 rounded-xl animate-pulse" />
-				<div className="h-20 bg-muted/50 rounded-xl animate-pulse" />
-			</div>
-		);
-	}
-
 	return (
 		<div className="space-y-3">
 			{sessions.map((session) => (
@@ -102,11 +87,7 @@ export function SessionList() {
 							<div className="text-xs text-muted-foreground flex items-center gap-2">
 								<span>{session.ip_address}</span>
 								<span className="size-1 rounded-full bg-border" />
-								<span>
-									{session.last_active_at
-										? `Active ${formatDistanceToNow(new Date(session.last_active_at), { addSuffix: true })}`
-										: "Never active"}
-								</span>
+								<SessionLastActiveLabel value={session.last_active_at} />
 							</div>
 						</div>
 					</div>
@@ -141,5 +122,38 @@ export function SessionList() {
 				</div>
 			))}
 		</div>
+	);
+}
+
+function SessionLastActiveLabel({ value }: { value: string | null }) {
+	const [isClient, setIsClient] = useState(false);
+
+	useEffect(() => {
+		setIsClient(true);
+	}, []);
+
+	if (!value) {
+		return <span>Never active</span>;
+	}
+
+	const parsedDate = new Date(value);
+	const isValidDate = !Number.isNaN(parsedDate.getTime());
+
+	if (!isClient || !isValidDate) {
+		if (!isValidDate) {
+			return <span>Active recently</span>;
+		}
+
+		return (
+			<span>
+				Active at {parsedDate.toISOString().slice(0, 16).replace("T", " ")} UTC
+			</span>
+		);
+	}
+
+	return (
+		<span suppressHydrationWarning>
+			Active {formatDistanceToNow(parsedDate, { addSuffix: true })}
+		</span>
 	);
 }

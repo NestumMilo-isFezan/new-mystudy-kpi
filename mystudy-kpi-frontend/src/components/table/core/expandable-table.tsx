@@ -1,4 +1,5 @@
-import { flexRender } from "@tanstack/react-table";
+import { flexRender, type Row } from "@tanstack/react-table";
+import React from "react";
 import { useTableContext } from "@/components/table/core/table-control";
 import {
 	Table,
@@ -11,9 +12,10 @@ import {
 } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
 
-type CoreTableProps = {
+type CoreExpandableTableProps<TData> = {
 	emptyMessage?: string;
 	className?: string;
+	renderSubComponent: (props: { row: Row<TData> }) => React.ReactNode;
 };
 
 function getStickyClass(sticky?: "left" | "right") {
@@ -40,11 +42,12 @@ function getAlignClass(align?: "start" | "center" | "end") {
 	return "text-left";
 }
 
-export function CoreTable({
+export function CoreExpandableTable<TData>({
 	emptyMessage = "No records found.",
 	className,
-}: CoreTableProps) {
-	const { table } = useTableContext();
+	renderSubComponent,
+}: CoreExpandableTableProps<TData>) {
+	const { table } = useTableContext<TData>();
 	const visibleColumnLength = table.getVisibleFlatColumns().length;
 
 	return (
@@ -86,28 +89,43 @@ export function CoreTable({
 				<TableBody>
 					{table.getRowModel().rows.length > 0 ? (
 						table.getRowModel().rows.map((row) => (
-							<TableRow key={row.id}>
-								{row.getVisibleCells().map((cell) => {
-									const stickyClass = getStickyClass(
-										cell.column.columnDef.meta?.sticky,
-									);
-									const alignClass = getAlignClass(
-										cell.column.columnDef.meta?.align,
-									);
+							<React.Fragment key={row.id}>
+								<TableRow
+									className={cn(
+										"cursor-pointer transition-colors hover:bg-muted/20",
+										row.getIsExpanded() && "bg-muted/5",
+									)}
+									onClick={() => row.toggleExpanded()}
+								>
+									{row.getVisibleCells().map((cell) => {
+										const stickyClass = getStickyClass(
+											cell.column.columnDef.meta?.sticky,
+										);
+										const alignClass = getAlignClass(
+											cell.column.columnDef.meta?.align,
+										);
 
-									return (
-										<TableCell
-											key={cell.id}
-											className={cn(stickyClass, alignClass, "bg-card")}
-										>
-											{flexRender(
-												cell.column.columnDef.cell,
-												cell.getContext(),
-											)}
+										return (
+											<TableCell
+												key={cell.id}
+												className={cn(stickyClass, alignClass, "bg-card")}
+											>
+												{flexRender(
+													cell.column.columnDef.cell,
+													cell.getContext(),
+												)}
+											</TableCell>
+										);
+									})}
+								</TableRow>
+								{row.getIsExpanded() && (
+									<TableRow className="bg-muted/5 border-b-0 hover:bg-muted/5">
+										<TableCell colSpan={visibleColumnLength} className="p-0">
+											{renderSubComponent({ row })}
 										</TableCell>
-									);
-								})}
-							</TableRow>
+									</TableRow>
+								)}
+							</React.Fragment>
 						))
 					) : (
 						<TableRow>

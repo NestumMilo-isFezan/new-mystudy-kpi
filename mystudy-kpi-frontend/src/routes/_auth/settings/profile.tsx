@@ -1,7 +1,6 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { Fingerprint, Key, User, UserX } from "lucide-react";
-import { Suspense } from "react";
 import { AccountForm } from "@/components/pages/settings/profile/account-form";
 import { DeleteAccountSection } from "@/components/pages/settings/profile/delete-account-section";
 import { PasswordForm } from "@/components/pages/settings/profile/password-form";
@@ -49,11 +48,7 @@ function ProfileSettingsPage() {
 					description="Manage your account identification and academic intake."
 					icon={Fingerprint}
 				/>
-				<Suspense
-					fallback={<div className="h-40 bg-muted animate-pulse rounded-lg" />}
-				>
-					<AccountForm user={session.user} />
-				</Suspense>
+				<AccountForm user={session.user} />
 			</section>
 
 			<Separator />
