@@ -10,7 +10,7 @@ export function getRouter() {
 
 		scrollRestoration: true,
 		defaultPreload: "intent",
-		defaultPreloadStaleTime: 0,
+		defaultPreloadStaleTime: 30 * 1000, // 30 seconds
 	});
 
 	return router;

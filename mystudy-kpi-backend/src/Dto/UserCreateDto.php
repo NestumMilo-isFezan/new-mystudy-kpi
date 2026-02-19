@@ -18,6 +18,17 @@ class UserCreateDto
     public string $email;
 
     #[Assert\NotBlank]
+    #[Assert\Length(max: 100)]
+    public string $firstName;
+
+    #[Assert\NotBlank]
+    #[Assert\Length(max: 100)]
+    public string $lastName;
+
+    #[Assert\Type('integer')]
+    public ?int $intakeBatchId = null;
+
+    #[Assert\NotBlank]
     #[Assert\Length(min: 8)]
     public string $password;
 }

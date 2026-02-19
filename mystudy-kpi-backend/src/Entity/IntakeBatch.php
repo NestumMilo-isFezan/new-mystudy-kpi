@@ -11,6 +11,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: IntakeBatchRepository::class)]
 #[ORM\Table(name: 'intake_batch')]
+#[ORM\UniqueConstraint(name: 'uniq_intake_batch_start_year', columns: ['start_year'])]
 class IntakeBatch
 {
     #[ORM\Id]
@@ -20,6 +21,9 @@ class IntakeBatch
 
     #[ORM\Column(type: 'string', length: 120)]
     private string $name;
+
+    #[ORM\Column(type: 'smallint')]
+    private int $startYear;
 
     #[ORM\Column(type: 'boolean', options: ['default' => true])]
     private bool $isActive = true;
@@ -46,6 +50,18 @@ class IntakeBatch
     public function setName(string $name): self
     {
         $this->name = trim($name);
+
+        return $this;
+    }
+
+    public function getStartYear(): int
+    {
+        return $this->startYear;
+    }
+
+    public function setStartYear(int $startYear): self
+    {
+        $this->startYear = $startYear;
 
         return $this;
     }

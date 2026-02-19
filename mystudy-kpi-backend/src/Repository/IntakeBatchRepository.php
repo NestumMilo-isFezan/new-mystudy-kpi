@@ -24,8 +24,13 @@ class IntakeBatchRepository extends ServiceEntityRepository
         return $this->createQueryBuilder('b')
             ->andWhere('b.isActive = :active')
             ->setParameter('active', true)
-            ->orderBy('b.name', 'ASC')
+            ->orderBy('b.startYear', 'ASC')
             ->getQuery()
             ->getResult();
+    }
+
+    public function findOneByStartYear(int $startYear): ?IntakeBatch
+    {
+        return $this->findOneBy(['startYear' => $startYear]);
     }
 }

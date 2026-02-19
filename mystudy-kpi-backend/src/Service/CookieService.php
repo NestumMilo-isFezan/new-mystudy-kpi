@@ -28,7 +28,7 @@ class CookieService
             ->withPath('/')
             ->withSameSite(Cookie::SAMESITE_LAX)
             ->withSecure($isSecure)
-            ->withExpires(new \DateTimeImmutable('+8 hours'));
+            ->withExpires(new \DateTimeImmutable('+30 days'));
     }
 
     public function clearAuthCookie(): Cookie

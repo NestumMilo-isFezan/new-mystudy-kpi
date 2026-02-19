@@ -6,7 +6,7 @@ import {
 	AuthCard,
 	type AuthFormValues,
 } from "@/components/pages/auth/auth-card";
-import { getIntakeBatches } from "@/lib/api/intake-batches-api";
+import { getIntakeBatchesFn as getIntakeBatches } from "@/lib/api/intake-batches.functions";
 import { useRegisterMutation } from "@/lib/auth/session-query";
 
 export const Route = createFileRoute("/_public/register")({

@@ -14,21 +14,29 @@ import { Route as AuthRouteRouteImport } from './routes/_auth/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as PublicRegisterRouteImport } from './routes/_public/register'
 import { Route as PublicLoginRouteImport } from './routes/_public/login'
-import { Route as AuthProfileRouteImport } from './routes/_auth/profile'
 import { Route as AuthDashboardRouteImport } from './routes/_auth/dashboard'
+import { Route as AuthSettingsRouteRouteImport } from './routes/_auth/settings/route'
 import { Route as AuthStudentRouteRouteImport } from './routes/_auth/_student/route'
 import { Route as AuthStaffRouteRouteImport } from './routes/_auth/_staff/route'
 import { Route as AuthLecturerRouteRouteImport } from './routes/_auth/_lecturer/route'
+import { Route as AuthSettingsUserSessionsRouteImport } from './routes/_auth/settings/user-sessions'
+import { Route as AuthSettingsProfileRouteImport } from './routes/_auth/settings/profile'
 import { Route as AuthStudentKpiOverviewRouteImport } from './routes/_auth/_student/kpi/overview'
-import { Route as AuthStudentKpiCurricularRouteImport } from './routes/_auth/_student/kpi/curricular'
 import { Route as AuthStudentKpiChallengesRouteImport } from './routes/_auth/_student/kpi/challenges'
-import { Route as AuthStudentKpiCgpaRouteImport } from './routes/_auth/_student/kpi/cgpa'
-import { Route as AuthStudentKpiCertificatesRouteImport } from './routes/_auth/_student/kpi/certificates'
-import { Route as AuthStaffStaffRegisterStudentRouteImport } from './routes/_auth/_staff/staff/register-student'
-import { Route as AuthStaffStaffRegisterLecturerRouteImport } from './routes/_auth/_staff/staff/register-lecturer'
+import { Route as AuthStaffStaffManageStudentsRouteImport } from './routes/_auth/_staff/staff/manage-students'
+import { Route as AuthStaffStaffManageLecturersRouteImport } from './routes/_auth/_staff/staff/manage-lecturers'
 import { Route as AuthStaffStaffIntakesRouteImport } from './routes/_auth/_staff/staff/intakes'
 import { Route as AuthLecturerMentorshipsStudentsRouteImport } from './routes/_auth/_lecturer/mentorships/students'
 import { Route as AuthLecturerMentorshipsDashboardRouteImport } from './routes/_auth/_lecturer/mentorships/dashboard'
+import { Route as AuthStudentKpiTargetRouteRouteImport } from './routes/_auth/_student/kpi/target/route'
+import { Route as AuthStudentKpiRecordsRouteRouteImport } from './routes/_auth/_student/kpi/records/route'
+import { Route as AuthStudentKpiAcademicsRouteRouteImport } from './routes/_auth/_student/kpi/academics/route'
+import { Route as AuthStudentKpiTargetIndexRouteImport } from './routes/_auth/_student/kpi/target/index'
+import { Route as AuthStudentKpiRecordsIndexRouteImport } from './routes/_auth/_student/kpi/records/index'
+import { Route as AuthStudentKpiAcademicsIndexRouteImport } from './routes/_auth/_student/kpi/academics/index'
+import { Route as AuthStudentKpiTargetEditRouteImport } from './routes/_auth/_student/kpi/target/edit'
+import { Route as AuthStudentKpiRecordsAnalyticsRouteImport } from './routes/_auth/_student/kpi/records/analytics'
+import { Route as AuthStudentKpiAcademicsAnalyticsRouteImport } from './routes/_auth/_student/kpi/academics/analytics'
 
 const PublicRouteRoute = PublicRouteRouteImport.update({
   id: '/_public',
@@ -53,14 +61,14 @@ const PublicLoginRoute = PublicLoginRouteImport.update({
   path: '/login',
   getParentRoute: () => PublicRouteRoute,
 } as any)
-const AuthProfileRoute = AuthProfileRouteImport.update({
-  id: '/profile',
-  path: '/profile',
-  getParentRoute: () => AuthRouteRoute,
-} as any)
 const AuthDashboardRoute = AuthDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
+  getParentRoute: () => AuthRouteRoute,
+} as any)
+const AuthSettingsRouteRoute = AuthSettingsRouteRouteImport.update({
+  id: '/settings',
+  path: '/settings',
   getParentRoute: () => AuthRouteRoute,
 } as any)
 const AuthStudentRouteRoute = AuthStudentRouteRouteImport.update({
@@ -75,44 +83,38 @@ const AuthLecturerRouteRoute = AuthLecturerRouteRouteImport.update({
   id: '/_lecturer',
   getParentRoute: () => AuthRouteRoute,
 } as any)
+const AuthSettingsUserSessionsRoute =
+  AuthSettingsUserSessionsRouteImport.update({
+    id: '/user-sessions',
+    path: '/user-sessions',
+    getParentRoute: () => AuthSettingsRouteRoute,
+  } as any)
+const AuthSettingsProfileRoute = AuthSettingsProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => AuthSettingsRouteRoute,
+} as any)
 const AuthStudentKpiOverviewRoute = AuthStudentKpiOverviewRouteImport.update({
   id: '/kpi/overview',
   path: '/kpi/overview',
   getParentRoute: () => AuthStudentRouteRoute,
 } as any)
-const AuthStudentKpiCurricularRoute =
-  AuthStudentKpiCurricularRouteImport.update({
-    id: '/kpi/curricular',
-    path: '/kpi/curricular',
-    getParentRoute: () => AuthStudentRouteRoute,
-  } as any)
 const AuthStudentKpiChallengesRoute =
   AuthStudentKpiChallengesRouteImport.update({
     id: '/kpi/challenges',
     path: '/kpi/challenges',
     getParentRoute: () => AuthStudentRouteRoute,
   } as any)
-const AuthStudentKpiCgpaRoute = AuthStudentKpiCgpaRouteImport.update({
-  id: '/kpi/cgpa',
-  path: '/kpi/cgpa',
-  getParentRoute: () => AuthStudentRouteRoute,
-} as any)
-const AuthStudentKpiCertificatesRoute =
-  AuthStudentKpiCertificatesRouteImport.update({
-    id: '/kpi/certificates',
-    path: '/kpi/certificates',
-    getParentRoute: () => AuthStudentRouteRoute,
-  } as any)
-const AuthStaffStaffRegisterStudentRoute =
-  AuthStaffStaffRegisterStudentRouteImport.update({
-    id: '/staff/register-student',
-    path: '/staff/register-student',
+const AuthStaffStaffManageStudentsRoute =
+  AuthStaffStaffManageStudentsRouteImport.update({
+    id: '/staff/manage-students',
+    path: '/staff/manage-students',
     getParentRoute: () => AuthStaffRouteRoute,
   } as any)
-const AuthStaffStaffRegisterLecturerRoute =
-  AuthStaffStaffRegisterLecturerRouteImport.update({
-    id: '/staff/register-lecturer',
-    path: '/staff/register-lecturer',
+const AuthStaffStaffManageLecturersRoute =
+  AuthStaffStaffManageLecturersRouteImport.update({
+    id: '/staff/manage-lecturers',
+    path: '/staff/manage-lecturers',
     getParentRoute: () => AuthStaffRouteRoute,
   } as any)
 const AuthStaffStaffIntakesRoute = AuthStaffStaffIntakesRouteImport.update({
@@ -132,40 +134,107 @@ const AuthLecturerMentorshipsDashboardRoute =
     path: '/mentorships/dashboard',
     getParentRoute: () => AuthLecturerRouteRoute,
   } as any)
+const AuthStudentKpiTargetRouteRoute =
+  AuthStudentKpiTargetRouteRouteImport.update({
+    id: '/kpi/target',
+    path: '/kpi/target',
+    getParentRoute: () => AuthStudentRouteRoute,
+  } as any)
+const AuthStudentKpiRecordsRouteRoute =
+  AuthStudentKpiRecordsRouteRouteImport.update({
+    id: '/kpi/records',
+    path: '/kpi/records',
+    getParentRoute: () => AuthStudentRouteRoute,
+  } as any)
+const AuthStudentKpiAcademicsRouteRoute =
+  AuthStudentKpiAcademicsRouteRouteImport.update({
+    id: '/kpi/academics',
+    path: '/kpi/academics',
+    getParentRoute: () => AuthStudentRouteRoute,
+  } as any)
+const AuthStudentKpiTargetIndexRoute =
+  AuthStudentKpiTargetIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthStudentKpiTargetRouteRoute,
+  } as any)
+const AuthStudentKpiRecordsIndexRoute =
+  AuthStudentKpiRecordsIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthStudentKpiRecordsRouteRoute,
+  } as any)
+const AuthStudentKpiAcademicsIndexRoute =
+  AuthStudentKpiAcademicsIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthStudentKpiAcademicsRouteRoute,
+  } as any)
+const AuthStudentKpiTargetEditRoute =
+  AuthStudentKpiTargetEditRouteImport.update({
+    id: '/edit',
+    path: '/edit',
+    getParentRoute: () => AuthStudentKpiTargetRouteRoute,
+  } as any)
+const AuthStudentKpiRecordsAnalyticsRoute =
+  AuthStudentKpiRecordsAnalyticsRouteImport.update({
+    id: '/analytics',
+    path: '/analytics',
+    getParentRoute: () => AuthStudentKpiRecordsRouteRoute,
+  } as any)
+const AuthStudentKpiAcademicsAnalyticsRoute =
+  AuthStudentKpiAcademicsAnalyticsRouteImport.update({
+    id: '/analytics',
+    path: '/analytics',
+    getParentRoute: () => AuthStudentKpiAcademicsRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/settings': typeof AuthSettingsRouteRouteWithChildren
   '/dashboard': typeof AuthDashboardRoute
-  '/profile': typeof AuthProfileRoute
   '/login': typeof PublicLoginRoute
   '/register': typeof PublicRegisterRoute
+  '/settings/profile': typeof AuthSettingsProfileRoute
+  '/settings/user-sessions': typeof AuthSettingsUserSessionsRoute
+  '/kpi/academics': typeof AuthStudentKpiAcademicsRouteRouteWithChildren
+  '/kpi/records': typeof AuthStudentKpiRecordsRouteRouteWithChildren
+  '/kpi/target': typeof AuthStudentKpiTargetRouteRouteWithChildren
   '/mentorships/dashboard': typeof AuthLecturerMentorshipsDashboardRoute
   '/mentorships/students': typeof AuthLecturerMentorshipsStudentsRoute
   '/staff/intakes': typeof AuthStaffStaffIntakesRoute
-  '/staff/register-lecturer': typeof AuthStaffStaffRegisterLecturerRoute
-  '/staff/register-student': typeof AuthStaffStaffRegisterStudentRoute
-  '/kpi/certificates': typeof AuthStudentKpiCertificatesRoute
-  '/kpi/cgpa': typeof AuthStudentKpiCgpaRoute
+  '/staff/manage-lecturers': typeof AuthStaffStaffManageLecturersRoute
+  '/staff/manage-students': typeof AuthStaffStaffManageStudentsRoute
   '/kpi/challenges': typeof AuthStudentKpiChallengesRoute
-  '/kpi/curricular': typeof AuthStudentKpiCurricularRoute
   '/kpi/overview': typeof AuthStudentKpiOverviewRoute
+  '/kpi/academics/analytics': typeof AuthStudentKpiAcademicsAnalyticsRoute
+  '/kpi/records/analytics': typeof AuthStudentKpiRecordsAnalyticsRoute
+  '/kpi/target/edit': typeof AuthStudentKpiTargetEditRoute
+  '/kpi/academics/': typeof AuthStudentKpiAcademicsIndexRoute
+  '/kpi/records/': typeof AuthStudentKpiRecordsIndexRoute
+  '/kpi/target/': typeof AuthStudentKpiTargetIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/settings': typeof AuthSettingsRouteRouteWithChildren
   '/dashboard': typeof AuthDashboardRoute
-  '/profile': typeof AuthProfileRoute
   '/login': typeof PublicLoginRoute
   '/register': typeof PublicRegisterRoute
+  '/settings/profile': typeof AuthSettingsProfileRoute
+  '/settings/user-sessions': typeof AuthSettingsUserSessionsRoute
   '/mentorships/dashboard': typeof AuthLecturerMentorshipsDashboardRoute
   '/mentorships/students': typeof AuthLecturerMentorshipsStudentsRoute
   '/staff/intakes': typeof AuthStaffStaffIntakesRoute
-  '/staff/register-lecturer': typeof AuthStaffStaffRegisterLecturerRoute
-  '/staff/register-student': typeof AuthStaffStaffRegisterStudentRoute
-  '/kpi/certificates': typeof AuthStudentKpiCertificatesRoute
-  '/kpi/cgpa': typeof AuthStudentKpiCgpaRoute
+  '/staff/manage-lecturers': typeof AuthStaffStaffManageLecturersRoute
+  '/staff/manage-students': typeof AuthStaffStaffManageStudentsRoute
   '/kpi/challenges': typeof AuthStudentKpiChallengesRoute
-  '/kpi/curricular': typeof AuthStudentKpiCurricularRoute
   '/kpi/overview': typeof AuthStudentKpiOverviewRoute
+  '/kpi/academics/analytics': typeof AuthStudentKpiAcademicsAnalyticsRoute
+  '/kpi/records/analytics': typeof AuthStudentKpiRecordsAnalyticsRoute
+  '/kpi/target/edit': typeof AuthStudentKpiTargetEditRoute
+  '/kpi/academics': typeof AuthStudentKpiAcademicsIndexRoute
+  '/kpi/records': typeof AuthStudentKpiRecordsIndexRoute
+  '/kpi/target': typeof AuthStudentKpiTargetIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -175,56 +244,77 @@ export interface FileRoutesById {
   '/_auth/_lecturer': typeof AuthLecturerRouteRouteWithChildren
   '/_auth/_staff': typeof AuthStaffRouteRouteWithChildren
   '/_auth/_student': typeof AuthStudentRouteRouteWithChildren
+  '/_auth/settings': typeof AuthSettingsRouteRouteWithChildren
   '/_auth/dashboard': typeof AuthDashboardRoute
-  '/_auth/profile': typeof AuthProfileRoute
   '/_public/login': typeof PublicLoginRoute
   '/_public/register': typeof PublicRegisterRoute
+  '/_auth/settings/profile': typeof AuthSettingsProfileRoute
+  '/_auth/settings/user-sessions': typeof AuthSettingsUserSessionsRoute
+  '/_auth/_student/kpi/academics': typeof AuthStudentKpiAcademicsRouteRouteWithChildren
+  '/_auth/_student/kpi/records': typeof AuthStudentKpiRecordsRouteRouteWithChildren
+  '/_auth/_student/kpi/target': typeof AuthStudentKpiTargetRouteRouteWithChildren
   '/_auth/_lecturer/mentorships/dashboard': typeof AuthLecturerMentorshipsDashboardRoute
   '/_auth/_lecturer/mentorships/students': typeof AuthLecturerMentorshipsStudentsRoute
   '/_auth/_staff/staff/intakes': typeof AuthStaffStaffIntakesRoute
-  '/_auth/_staff/staff/register-lecturer': typeof AuthStaffStaffRegisterLecturerRoute
-  '/_auth/_staff/staff/register-student': typeof AuthStaffStaffRegisterStudentRoute
-  '/_auth/_student/kpi/certificates': typeof AuthStudentKpiCertificatesRoute
-  '/_auth/_student/kpi/cgpa': typeof AuthStudentKpiCgpaRoute
+  '/_auth/_staff/staff/manage-lecturers': typeof AuthStaffStaffManageLecturersRoute
+  '/_auth/_staff/staff/manage-students': typeof AuthStaffStaffManageStudentsRoute
   '/_auth/_student/kpi/challenges': typeof AuthStudentKpiChallengesRoute
-  '/_auth/_student/kpi/curricular': typeof AuthStudentKpiCurricularRoute
   '/_auth/_student/kpi/overview': typeof AuthStudentKpiOverviewRoute
+  '/_auth/_student/kpi/academics/analytics': typeof AuthStudentKpiAcademicsAnalyticsRoute
+  '/_auth/_student/kpi/records/analytics': typeof AuthStudentKpiRecordsAnalyticsRoute
+  '/_auth/_student/kpi/target/edit': typeof AuthStudentKpiTargetEditRoute
+  '/_auth/_student/kpi/academics/': typeof AuthStudentKpiAcademicsIndexRoute
+  '/_auth/_student/kpi/records/': typeof AuthStudentKpiRecordsIndexRoute
+  '/_auth/_student/kpi/target/': typeof AuthStudentKpiTargetIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/settings'
     | '/dashboard'
-    | '/profile'
     | '/login'
     | '/register'
+    | '/settings/profile'
+    | '/settings/user-sessions'
+    | '/kpi/academics'
+    | '/kpi/records'
+    | '/kpi/target'
     | '/mentorships/dashboard'
     | '/mentorships/students'
     | '/staff/intakes'
-    | '/staff/register-lecturer'
-    | '/staff/register-student'
-    | '/kpi/certificates'
-    | '/kpi/cgpa'
+    | '/staff/manage-lecturers'
+    | '/staff/manage-students'
     | '/kpi/challenges'
-    | '/kpi/curricular'
     | '/kpi/overview'
+    | '/kpi/academics/analytics'
+    | '/kpi/records/analytics'
+    | '/kpi/target/edit'
+    | '/kpi/academics/'
+    | '/kpi/records/'
+    | '/kpi/target/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/settings'
     | '/dashboard'
-    | '/profile'
     | '/login'
     | '/register'
+    | '/settings/profile'
+    | '/settings/user-sessions'
     | '/mentorships/dashboard'
     | '/mentorships/students'
     | '/staff/intakes'
-    | '/staff/register-lecturer'
-    | '/staff/register-student'
-    | '/kpi/certificates'
-    | '/kpi/cgpa'
+    | '/staff/manage-lecturers'
+    | '/staff/manage-students'
     | '/kpi/challenges'
-    | '/kpi/curricular'
     | '/kpi/overview'
+    | '/kpi/academics/analytics'
+    | '/kpi/records/analytics'
+    | '/kpi/target/edit'
+    | '/kpi/academics'
+    | '/kpi/records'
+    | '/kpi/target'
   id:
     | '__root__'
     | '/'
@@ -233,20 +323,28 @@ export interface FileRouteTypes {
     | '/_auth/_lecturer'
     | '/_auth/_staff'
     | '/_auth/_student'
+    | '/_auth/settings'
     | '/_auth/dashboard'
-    | '/_auth/profile'
     | '/_public/login'
     | '/_public/register'
+    | '/_auth/settings/profile'
+    | '/_auth/settings/user-sessions'
+    | '/_auth/_student/kpi/academics'
+    | '/_auth/_student/kpi/records'
+    | '/_auth/_student/kpi/target'
     | '/_auth/_lecturer/mentorships/dashboard'
     | '/_auth/_lecturer/mentorships/students'
     | '/_auth/_staff/staff/intakes'
-    | '/_auth/_staff/staff/register-lecturer'
-    | '/_auth/_staff/staff/register-student'
-    | '/_auth/_student/kpi/certificates'
-    | '/_auth/_student/kpi/cgpa'
+    | '/_auth/_staff/staff/manage-lecturers'
+    | '/_auth/_staff/staff/manage-students'
     | '/_auth/_student/kpi/challenges'
-    | '/_auth/_student/kpi/curricular'
     | '/_auth/_student/kpi/overview'
+    | '/_auth/_student/kpi/academics/analytics'
+    | '/_auth/_student/kpi/records/analytics'
+    | '/_auth/_student/kpi/target/edit'
+    | '/_auth/_student/kpi/academics/'
+    | '/_auth/_student/kpi/records/'
+    | '/_auth/_student/kpi/target/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -292,18 +390,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PublicLoginRouteImport
       parentRoute: typeof PublicRouteRoute
     }
-    '/_auth/profile': {
-      id: '/_auth/profile'
-      path: '/profile'
-      fullPath: '/profile'
-      preLoaderRoute: typeof AuthProfileRouteImport
-      parentRoute: typeof AuthRouteRoute
-    }
     '/_auth/dashboard': {
       id: '/_auth/dashboard'
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof AuthDashboardRouteImport
+      parentRoute: typeof AuthRouteRoute
+    }
+    '/_auth/settings': {
+      id: '/_auth/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof AuthSettingsRouteRouteImport
       parentRoute: typeof AuthRouteRoute
     }
     '/_auth/_student': {
@@ -327,18 +425,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthLecturerRouteRouteImport
       parentRoute: typeof AuthRouteRoute
     }
+    '/_auth/settings/user-sessions': {
+      id: '/_auth/settings/user-sessions'
+      path: '/user-sessions'
+      fullPath: '/settings/user-sessions'
+      preLoaderRoute: typeof AuthSettingsUserSessionsRouteImport
+      parentRoute: typeof AuthSettingsRouteRoute
+    }
+    '/_auth/settings/profile': {
+      id: '/_auth/settings/profile'
+      path: '/profile'
+      fullPath: '/settings/profile'
+      preLoaderRoute: typeof AuthSettingsProfileRouteImport
+      parentRoute: typeof AuthSettingsRouteRoute
+    }
     '/_auth/_student/kpi/overview': {
       id: '/_auth/_student/kpi/overview'
       path: '/kpi/overview'
       fullPath: '/kpi/overview'
       preLoaderRoute: typeof AuthStudentKpiOverviewRouteImport
-      parentRoute: typeof AuthStudentRouteRoute
-    }
-    '/_auth/_student/kpi/curricular': {
-      id: '/_auth/_student/kpi/curricular'
-      path: '/kpi/curricular'
-      fullPath: '/kpi/curricular'
-      preLoaderRoute: typeof AuthStudentKpiCurricularRouteImport
       parentRoute: typeof AuthStudentRouteRoute
     }
     '/_auth/_student/kpi/challenges': {
@@ -348,32 +453,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthStudentKpiChallengesRouteImport
       parentRoute: typeof AuthStudentRouteRoute
     }
-    '/_auth/_student/kpi/cgpa': {
-      id: '/_auth/_student/kpi/cgpa'
-      path: '/kpi/cgpa'
-      fullPath: '/kpi/cgpa'
-      preLoaderRoute: typeof AuthStudentKpiCgpaRouteImport
-      parentRoute: typeof AuthStudentRouteRoute
-    }
-    '/_auth/_student/kpi/certificates': {
-      id: '/_auth/_student/kpi/certificates'
-      path: '/kpi/certificates'
-      fullPath: '/kpi/certificates'
-      preLoaderRoute: typeof AuthStudentKpiCertificatesRouteImport
-      parentRoute: typeof AuthStudentRouteRoute
-    }
-    '/_auth/_staff/staff/register-student': {
-      id: '/_auth/_staff/staff/register-student'
-      path: '/staff/register-student'
-      fullPath: '/staff/register-student'
-      preLoaderRoute: typeof AuthStaffStaffRegisterStudentRouteImport
+    '/_auth/_staff/staff/manage-students': {
+      id: '/_auth/_staff/staff/manage-students'
+      path: '/staff/manage-students'
+      fullPath: '/staff/manage-students'
+      preLoaderRoute: typeof AuthStaffStaffManageStudentsRouteImport
       parentRoute: typeof AuthStaffRouteRoute
     }
-    '/_auth/_staff/staff/register-lecturer': {
-      id: '/_auth/_staff/staff/register-lecturer'
-      path: '/staff/register-lecturer'
-      fullPath: '/staff/register-lecturer'
-      preLoaderRoute: typeof AuthStaffStaffRegisterLecturerRouteImport
+    '/_auth/_staff/staff/manage-lecturers': {
+      id: '/_auth/_staff/staff/manage-lecturers'
+      path: '/staff/manage-lecturers'
+      fullPath: '/staff/manage-lecturers'
+      preLoaderRoute: typeof AuthStaffStaffManageLecturersRouteImport
       parentRoute: typeof AuthStaffRouteRoute
     }
     '/_auth/_staff/staff/intakes': {
@@ -397,6 +488,69 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthLecturerMentorshipsDashboardRouteImport
       parentRoute: typeof AuthLecturerRouteRoute
     }
+    '/_auth/_student/kpi/target': {
+      id: '/_auth/_student/kpi/target'
+      path: '/kpi/target'
+      fullPath: '/kpi/target'
+      preLoaderRoute: typeof AuthStudentKpiTargetRouteRouteImport
+      parentRoute: typeof AuthStudentRouteRoute
+    }
+    '/_auth/_student/kpi/records': {
+      id: '/_auth/_student/kpi/records'
+      path: '/kpi/records'
+      fullPath: '/kpi/records'
+      preLoaderRoute: typeof AuthStudentKpiRecordsRouteRouteImport
+      parentRoute: typeof AuthStudentRouteRoute
+    }
+    '/_auth/_student/kpi/academics': {
+      id: '/_auth/_student/kpi/academics'
+      path: '/kpi/academics'
+      fullPath: '/kpi/academics'
+      preLoaderRoute: typeof AuthStudentKpiAcademicsRouteRouteImport
+      parentRoute: typeof AuthStudentRouteRoute
+    }
+    '/_auth/_student/kpi/target/': {
+      id: '/_auth/_student/kpi/target/'
+      path: '/'
+      fullPath: '/kpi/target/'
+      preLoaderRoute: typeof AuthStudentKpiTargetIndexRouteImport
+      parentRoute: typeof AuthStudentKpiTargetRouteRoute
+    }
+    '/_auth/_student/kpi/records/': {
+      id: '/_auth/_student/kpi/records/'
+      path: '/'
+      fullPath: '/kpi/records/'
+      preLoaderRoute: typeof AuthStudentKpiRecordsIndexRouteImport
+      parentRoute: typeof AuthStudentKpiRecordsRouteRoute
+    }
+    '/_auth/_student/kpi/academics/': {
+      id: '/_auth/_student/kpi/academics/'
+      path: '/'
+      fullPath: '/kpi/academics/'
+      preLoaderRoute: typeof AuthStudentKpiAcademicsIndexRouteImport
+      parentRoute: typeof AuthStudentKpiAcademicsRouteRoute
+    }
+    '/_auth/_student/kpi/target/edit': {
+      id: '/_auth/_student/kpi/target/edit'
+      path: '/edit'
+      fullPath: '/kpi/target/edit'
+      preLoaderRoute: typeof AuthStudentKpiTargetEditRouteImport
+      parentRoute: typeof AuthStudentKpiTargetRouteRoute
+    }
+    '/_auth/_student/kpi/records/analytics': {
+      id: '/_auth/_student/kpi/records/analytics'
+      path: '/analytics'
+      fullPath: '/kpi/records/analytics'
+      preLoaderRoute: typeof AuthStudentKpiRecordsAnalyticsRouteImport
+      parentRoute: typeof AuthStudentKpiRecordsRouteRoute
+    }
+    '/_auth/_student/kpi/academics/analytics': {
+      id: '/_auth/_student/kpi/academics/analytics'
+      path: '/analytics'
+      fullPath: '/kpi/academics/analytics'
+      preLoaderRoute: typeof AuthStudentKpiAcademicsAnalyticsRouteImport
+      parentRoute: typeof AuthStudentKpiAcademicsRouteRoute
+    }
   }
 }
 
@@ -415,53 +569,116 @@ const AuthLecturerRouteRouteWithChildren =
 
 interface AuthStaffRouteRouteChildren {
   AuthStaffStaffIntakesRoute: typeof AuthStaffStaffIntakesRoute
-  AuthStaffStaffRegisterLecturerRoute: typeof AuthStaffStaffRegisterLecturerRoute
-  AuthStaffStaffRegisterStudentRoute: typeof AuthStaffStaffRegisterStudentRoute
+  AuthStaffStaffManageLecturersRoute: typeof AuthStaffStaffManageLecturersRoute
+  AuthStaffStaffManageStudentsRoute: typeof AuthStaffStaffManageStudentsRoute
 }
 
 const AuthStaffRouteRouteChildren: AuthStaffRouteRouteChildren = {
   AuthStaffStaffIntakesRoute: AuthStaffStaffIntakesRoute,
-  AuthStaffStaffRegisterLecturerRoute: AuthStaffStaffRegisterLecturerRoute,
-  AuthStaffStaffRegisterStudentRoute: AuthStaffStaffRegisterStudentRoute,
+  AuthStaffStaffManageLecturersRoute: AuthStaffStaffManageLecturersRoute,
+  AuthStaffStaffManageStudentsRoute: AuthStaffStaffManageStudentsRoute,
 }
 
 const AuthStaffRouteRouteWithChildren = AuthStaffRouteRoute._addFileChildren(
   AuthStaffRouteRouteChildren,
 )
 
+interface AuthStudentKpiAcademicsRouteRouteChildren {
+  AuthStudentKpiAcademicsAnalyticsRoute: typeof AuthStudentKpiAcademicsAnalyticsRoute
+  AuthStudentKpiAcademicsIndexRoute: typeof AuthStudentKpiAcademicsIndexRoute
+}
+
+const AuthStudentKpiAcademicsRouteRouteChildren: AuthStudentKpiAcademicsRouteRouteChildren =
+  {
+    AuthStudentKpiAcademicsAnalyticsRoute:
+      AuthStudentKpiAcademicsAnalyticsRoute,
+    AuthStudentKpiAcademicsIndexRoute: AuthStudentKpiAcademicsIndexRoute,
+  }
+
+const AuthStudentKpiAcademicsRouteRouteWithChildren =
+  AuthStudentKpiAcademicsRouteRoute._addFileChildren(
+    AuthStudentKpiAcademicsRouteRouteChildren,
+  )
+
+interface AuthStudentKpiRecordsRouteRouteChildren {
+  AuthStudentKpiRecordsAnalyticsRoute: typeof AuthStudentKpiRecordsAnalyticsRoute
+  AuthStudentKpiRecordsIndexRoute: typeof AuthStudentKpiRecordsIndexRoute
+}
+
+const AuthStudentKpiRecordsRouteRouteChildren: AuthStudentKpiRecordsRouteRouteChildren =
+  {
+    AuthStudentKpiRecordsAnalyticsRoute: AuthStudentKpiRecordsAnalyticsRoute,
+    AuthStudentKpiRecordsIndexRoute: AuthStudentKpiRecordsIndexRoute,
+  }
+
+const AuthStudentKpiRecordsRouteRouteWithChildren =
+  AuthStudentKpiRecordsRouteRoute._addFileChildren(
+    AuthStudentKpiRecordsRouteRouteChildren,
+  )
+
+interface AuthStudentKpiTargetRouteRouteChildren {
+  AuthStudentKpiTargetEditRoute: typeof AuthStudentKpiTargetEditRoute
+  AuthStudentKpiTargetIndexRoute: typeof AuthStudentKpiTargetIndexRoute
+}
+
+const AuthStudentKpiTargetRouteRouteChildren: AuthStudentKpiTargetRouteRouteChildren =
+  {
+    AuthStudentKpiTargetEditRoute: AuthStudentKpiTargetEditRoute,
+    AuthStudentKpiTargetIndexRoute: AuthStudentKpiTargetIndexRoute,
+  }
+
+const AuthStudentKpiTargetRouteRouteWithChildren =
+  AuthStudentKpiTargetRouteRoute._addFileChildren(
+    AuthStudentKpiTargetRouteRouteChildren,
+  )
+
 interface AuthStudentRouteRouteChildren {
-  AuthStudentKpiCertificatesRoute: typeof AuthStudentKpiCertificatesRoute
-  AuthStudentKpiCgpaRoute: typeof AuthStudentKpiCgpaRoute
+  AuthStudentKpiAcademicsRouteRoute: typeof AuthStudentKpiAcademicsRouteRouteWithChildren
+  AuthStudentKpiRecordsRouteRoute: typeof AuthStudentKpiRecordsRouteRouteWithChildren
+  AuthStudentKpiTargetRouteRoute: typeof AuthStudentKpiTargetRouteRouteWithChildren
   AuthStudentKpiChallengesRoute: typeof AuthStudentKpiChallengesRoute
-  AuthStudentKpiCurricularRoute: typeof AuthStudentKpiCurricularRoute
   AuthStudentKpiOverviewRoute: typeof AuthStudentKpiOverviewRoute
 }
 
 const AuthStudentRouteRouteChildren: AuthStudentRouteRouteChildren = {
-  AuthStudentKpiCertificatesRoute: AuthStudentKpiCertificatesRoute,
-  AuthStudentKpiCgpaRoute: AuthStudentKpiCgpaRoute,
+  AuthStudentKpiAcademicsRouteRoute:
+    AuthStudentKpiAcademicsRouteRouteWithChildren,
+  AuthStudentKpiRecordsRouteRoute: AuthStudentKpiRecordsRouteRouteWithChildren,
+  AuthStudentKpiTargetRouteRoute: AuthStudentKpiTargetRouteRouteWithChildren,
   AuthStudentKpiChallengesRoute: AuthStudentKpiChallengesRoute,
-  AuthStudentKpiCurricularRoute: AuthStudentKpiCurricularRoute,
   AuthStudentKpiOverviewRoute: AuthStudentKpiOverviewRoute,
 }
 
 const AuthStudentRouteRouteWithChildren =
   AuthStudentRouteRoute._addFileChildren(AuthStudentRouteRouteChildren)
 
+interface AuthSettingsRouteRouteChildren {
+  AuthSettingsProfileRoute: typeof AuthSettingsProfileRoute
+  AuthSettingsUserSessionsRoute: typeof AuthSettingsUserSessionsRoute
+}
+
+const AuthSettingsRouteRouteChildren: AuthSettingsRouteRouteChildren = {
+  AuthSettingsProfileRoute: AuthSettingsProfileRoute,
+  AuthSettingsUserSessionsRoute: AuthSettingsUserSessionsRoute,
+}
+
+const AuthSettingsRouteRouteWithChildren =
+  AuthSettingsRouteRoute._addFileChildren(AuthSettingsRouteRouteChildren)
+
 interface AuthRouteRouteChildren {
   AuthLecturerRouteRoute: typeof AuthLecturerRouteRouteWithChildren
   AuthStaffRouteRoute: typeof AuthStaffRouteRouteWithChildren
   AuthStudentRouteRoute: typeof AuthStudentRouteRouteWithChildren
+  AuthSettingsRouteRoute: typeof AuthSettingsRouteRouteWithChildren
   AuthDashboardRoute: typeof AuthDashboardRoute
-  AuthProfileRoute: typeof AuthProfileRoute
 }
 
 const AuthRouteRouteChildren: AuthRouteRouteChildren = {
   AuthLecturerRouteRoute: AuthLecturerRouteRouteWithChildren,
   AuthStaffRouteRoute: AuthStaffRouteRouteWithChildren,
   AuthStudentRouteRoute: AuthStudentRouteRouteWithChildren,
+  AuthSettingsRouteRoute: AuthSettingsRouteRouteWithChildren,
   AuthDashboardRoute: AuthDashboardRoute,
-  AuthProfileRoute: AuthProfileRoute,
 }
 
 const AuthRouteRouteWithChildren = AuthRouteRoute._addFileChildren(

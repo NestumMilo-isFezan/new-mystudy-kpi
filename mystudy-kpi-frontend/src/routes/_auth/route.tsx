@@ -2,15 +2,21 @@ import {
 	createFileRoute,
 	Link,
 	Outlet,
+	redirect,
 	useRouter,
 } from "@tanstack/react-router";
 
 import AuthLayout from "@/components/layouts/auth-layout";
-import { requireAuth } from "@/lib/auth/route-guards";
+import { sessionQueryOptions } from "@/lib/auth/session-query";
 
 export const Route = createFileRoute("/_auth")({
 	beforeLoad: async ({ context }) => {
-		const session = await requireAuth(context.queryClient);
+		const session =
+			await context.queryClient.ensureQueryData(sessionQueryOptions);
+
+		if (!session) {
+			throw redirect({ to: "/login" });
+		}
 
 		return { session };
 	},

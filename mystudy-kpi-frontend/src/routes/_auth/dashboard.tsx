@@ -14,15 +14,21 @@ function DashboardPage() {
 		return null;
 	}
 
+	const displayName =
+		[
+			session.profile?.firstName ?? session.user.firstName,
+			session.profile?.lastName ?? session.user.lastName,
+		]
+			.filter(Boolean)
+			.join(" ") || session.user.identifier;
+
 	return (
 		<div className="py-6 text-foreground">
 			<section className="rounded-2xl border border-border bg-card p-8 shadow-sm">
 				<p className="text-sm uppercase tracking-[0.18em] text-primary">
 					Dashboard
 				</p>
-				<h2 className="mt-2 text-3xl font-semibold">
-					Welcome, {session.user.identifier}
-				</h2>
+				<h2 className="mt-2 text-3xl font-semibold">Welcome, {displayName}</h2>
 				<p className="mt-2 text-muted-foreground">
 					You are logged in as{" "}
 					<span className="font-semibold">{mapRole(session.user.role)}</span>.

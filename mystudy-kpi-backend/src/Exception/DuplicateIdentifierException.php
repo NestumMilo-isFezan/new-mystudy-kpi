@@ -10,4 +10,9 @@ class DuplicateIdentifierException extends DomainException
     {
         parent::__construct($message, $code, $previous);
     }
+
+    public function getStatusCode(): int
+    {
+        return 409;
+    }
 }

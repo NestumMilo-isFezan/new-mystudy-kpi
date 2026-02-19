@@ -18,7 +18,21 @@ import {
 
 const breadcrumbPageMap: Record<string, string> = {
 	"/dashboard": "Dashboard",
-	"/profile": "Profile",
+	"/settings/profile": "Profile Settings",
+	"/settings/user-sessions": "Browser Sessions",
+	"/staff/intakes": "Manage Intakes",
+	"/staff/manage-lecturers": "Manage Lecturers",
+	"/staff/manage-students": "Manage Students",
+	"/kpi/overview": "KPI Overview",
+	"/kpi/academics": "Manage Academics",
+	"/kpi/academics/analytics": "Academic Analytics",
+	"/kpi/records": "KPI Achievements",
+	"/kpi/records/analytics": "KPI Analytics",
+	"/kpi/target": "Manage KPI Target",
+	"/kpi/target/edit": "Edit KPI Target",
+	"/kpi/challenges": "Manage Challenges",
+	"/mentorships/dashboard": "Mentorship Dashboard",
+	"/mentorships/students": "My Students",
 };
 
 const authRouteApi = getRouteApi("/_auth");

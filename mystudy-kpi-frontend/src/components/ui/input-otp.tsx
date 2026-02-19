@@ -72,7 +72,8 @@ function InputOTPSeparator({ ...props }: React.ComponentProps<"div">) {
 		<div
 			data-slot="input-otp-separator"
 			className="[&_svg:not([class*='size-'])]:size-4 flex items-center"
-			role="separator"
+			role="presentation"
+			aria-hidden="true"
 			{...props}
 		>
 			<MinusIcon />

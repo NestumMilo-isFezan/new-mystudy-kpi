@@ -83,6 +83,18 @@ export function putRequest<TResponse, TBody>(
 	return request<TResponse>(path, { ...options, method: "PUT", json });
 }
 
+export function patchRequest<TResponse, TBody>(
+	path: string,
+	json: TBody,
+	options?: Options,
+) {
+	return request<TResponse>(path, { ...options, method: "PATCH", json });
+}
+
+export function deleteRequest<TResponse>(path: string, options?: Options) {
+	return request<TResponse>(path, { ...options, method: "DELETE" });
+}
+
 export function isApiError(error: unknown): error is ApiError {
 	return error instanceof ApiError;
 }

@@ -1,3 +1,5 @@
+/* biome-ignore-all lint/suspicious/noDocumentCookie: Used for persistent sidebar state */
+/* biome-ignore-all lint/correctness/useExhaustiveDependencies: Base UI pattern */
 import { mergeProps } from "@base-ui/react/merge-props";
 import { useRender } from "@base-ui/react/use-render";
 import { cva, type VariantProps } from "class-variance-authority";
@@ -69,6 +71,17 @@ function SidebarProvider({
 	// This is the internal state of the sidebar.
 	// We use openProp and setOpenProp for control from outside the component.
 	const [_open, _setOpen] = React.useState(defaultOpen);
+
+	React.useEffect(() => {
+		const cookies = document.cookie.split("; ");
+		const stateCookie = cookies.find((c) =>
+			c.startsWith(`${SIDEBAR_COOKIE_NAME}=`),
+		);
+		if (stateCookie) {
+			_setOpen(stateCookie.split("=")[1] === "true");
+		}
+	}, []);
+
 	const open = openProp ?? _open;
 	const setOpen = React.useCallback(
 		(value: boolean | ((value: boolean) => boolean)) => {
@@ -602,9 +615,11 @@ function SidebarMenuSkeleton({
 	showIcon?: boolean;
 }) {
 	// Random width between 50 to 90%.
-	const [width] = React.useState(() => {
-		return `${Math.floor(Math.random() * 40) + 50}%`;
-	});
+	const [width, setWidth] = React.useState("50%");
+
+	React.useEffect(() => {
+		setWidth(`${Math.floor(Math.random() * 40) + 50}%`);
+	}, []);
 
 	return (
 		<div

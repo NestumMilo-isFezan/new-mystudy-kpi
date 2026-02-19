@@ -1,3 +1,4 @@
+/* biome-ignore-all lint/security/noDangerouslySetInnerHtml: Used for dynamic theme CSS variables */
 "use client";
 
 import * as React from "react";

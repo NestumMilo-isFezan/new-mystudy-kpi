@@ -7,12 +7,15 @@ import {
 	useRouterState,
 } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
+import { useEffect, useState } from "react";
 import PublicLayout from "@/components/layouts/public-layout";
+import { ModalProvider } from "@/components/modal/modal-provider";
+import { ThemeProvider } from "@/components/theme-provider";
+import { Toaster } from "@/components/ui/sonner";
 import TanStackQueryDevtools from "../integrations/tanstack-query/devtools";
 
 import TanStackQueryProvider from "../integrations/tanstack-query/root-provider";
-import { getServerSession } from "../lib/auth/get-server-session";
-import { sessionQueryKey } from "../lib/auth/session-query";
+import { sessionQueryOptions } from "../lib/auth/session-query";
 import appCss from "../styles.css?url";
 
 interface MyRouterContext {
@@ -21,8 +24,8 @@ interface MyRouterContext {
 
 export const Route = createRootRouteWithContext<MyRouterContext>()({
 	loader: async ({ context }) => {
-		const initialSession = await getServerSession();
-		context.queryClient.setQueryData(sessionQueryKey, initialSession);
+		const initialSession =
+			await context.queryClient.ensureQueryData(sessionQueryOptions);
 
 		return {
 			initialSession,
@@ -56,7 +59,13 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 	const pathname = useRouterState({
 		select: (state) => state.location.pathname,
 	});
-	const showLandingHeader = pathname === "/";
+
+	const [isMounted, setIsMounted] = useState(false);
+	useEffect(() => {
+		setIsMounted(true);
+	}, []);
+
+	const showLandingHeader = isMounted && pathname === "/";
 
 	return (
 		<html lang="en">
@@ -65,25 +74,30 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 			</head>
 			<body>
 				<TanStackQueryProvider queryClient={queryClient}>
-					{showLandingHeader ? (
-						<PublicLayout>{children}</PublicLayout>
-					) : (
-						children
-					)}
-					{import.meta.env.DEV ? (
-						<TanStackDevtools
-							config={{
-								position: "bottom-right",
-							}}
-							plugins={[
-								{
-									name: "Tanstack Router",
-									render: <TanStackRouterDevtoolsPanel />,
-								},
-								TanStackQueryDevtools,
-							]}
-						/>
-					) : null}
+					<ThemeProvider defaultTheme="system" storageKey="mystudy-kpi-theme">
+						<ModalProvider>
+							{showLandingHeader ? (
+								<PublicLayout>{children}</PublicLayout>
+							) : (
+								children
+							)}
+							<Toaster />
+							{import.meta.env.DEV ? (
+								<TanStackDevtools
+									config={{
+										position: "bottom-right",
+									}}
+									plugins={[
+										{
+											name: "Tanstack Router",
+											render: <TanStackRouterDevtoolsPanel />,
+										},
+										TanStackQueryDevtools,
+									]}
+								/>
+							) : null}
+						</ModalProvider>
+					</ThemeProvider>
 				</TanStackQueryProvider>
 				<Scripts />
 			</body>

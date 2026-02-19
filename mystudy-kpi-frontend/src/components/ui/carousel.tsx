@@ -1,3 +1,4 @@
+/* biome-ignore-all lint/a11y/useSemanticElements: Carousel pattern uses region and group roles */
 import useEmblaCarousel, {
 	type UseEmblaCarouselType,
 } from "embla-carousel-react";

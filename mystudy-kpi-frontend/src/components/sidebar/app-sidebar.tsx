@@ -1,7 +1,7 @@
 import { ChartBar, LayoutDashboard, UsersRound, Wrench } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 
-import type { SessionResponse } from "@/lib/api/profile-api";
+import type { SessionResponse } from "@/lib/api/profile.functions";
 import { type AppRole, mapRole } from "@/lib/auth/role-map";
 import {
 	Sidebar,
@@ -31,10 +31,10 @@ const navMainItems: NavMainItemWithRoles[] = [
 		roles: ["student", "lecturer", "staff"],
 		items: [
 			{ title: "Overview", url: "/kpi/overview" },
-			{ title: "CGPA", url: "/kpi/cgpa" },
-			{ title: "Curricular", url: "/kpi/curricular" },
-			{ title: "Certificates", url: "/kpi/certificates" },
-			{ title: "Challenges", url: "/kpi/challenges" },
+			{ title: "Manage Academics", url: "/kpi/academics" },
+			{ title: "Manage KPI Records", url: "/kpi/records" },
+			{ title: "Manage KPI Target", url: "/kpi/target" },
+			{ title: "Manage Challenges", url: "/kpi/challenges" },
 		],
 	},
 	{
@@ -54,8 +54,8 @@ const navMainItems: NavMainItemWithRoles[] = [
 		roles: ["staff"],
 		items: [
 			{ title: "Manage Intakes", url: "/staff/intakes" },
-			{ title: "Register Lecturer", url: "/staff/register-lecturer" },
-			{ title: "Register Student", url: "/staff/register-student" },
+			{ title: "Manage Lecturers", url: "/staff/manage-lecturers" },
+			{ title: "Manage Students", url: "/staff/manage-students" },
 		],
 	},
 ];
@@ -80,26 +80,17 @@ export function AppSidebar({
 		});
 	}, [userRole]);
 
-	const profileName = useMemo(
-		() =>
-			[session.profile?.firstName, session.profile?.lastName]
-				.filter(Boolean)
-				.join(" "),
-		[session.profile?.firstName, session.profile?.lastName],
-	);
-	const [stableDisplayName, setStableDisplayName] = useState(
-		session.user.identifier,
-	);
-
-	useEffect(() => {
-		setStableDisplayName(session.user.identifier);
-	}, [session.user.identifier]);
-
-	useEffect(() => {
-		if (profileName) {
-			setStableDisplayName(profileName);
-		}
-	}, [profileName]);
+	const profileName = useMemo(() => {
+		const firstName = session.profile?.firstName ?? session.user.firstName;
+		const lastName = session.profile?.lastName ?? session.user.lastName;
+		return [firstName, lastName].filter(Boolean).join(" ");
+	}, [
+		session.profile?.firstName,
+		session.profile?.lastName,
+		session.user.firstName,
+		session.user.lastName,
+	]);
+	const displayName = profileName || session.user.identifier;
 
 	return (
 		<Sidebar {...props}>
@@ -112,7 +103,7 @@ export function AppSidebar({
 			<SidebarFooter>
 				<NavUser
 					user={{
-						name: stableDisplayName,
+						name: displayName,
 						email: session.user.email,
 					}}
 				/>

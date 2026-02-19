@@ -17,7 +17,7 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
-import type { IntakeBatch } from "@/lib/api/intake-batches-api";
+import type { IntakeBatch } from "@/lib/api/intake-batches.functions";
 import { cn } from "@/lib/utils";
 
 export type AuthFormValues = {

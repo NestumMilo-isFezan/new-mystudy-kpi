@@ -4,7 +4,15 @@ import type { ReactNode } from "react";
 let browserQueryClient: QueryClient | undefined;
 
 function createQueryClient() {
-	return new QueryClient();
+	return new QueryClient({
+		defaultOptions: {
+			queries: {
+				staleTime: 60 * 1000, // 1 minute
+				refetchOnWindowFocus: false,
+				retry: false,
+			},
+		},
+	});
 }
 
 function getQueryClient() {

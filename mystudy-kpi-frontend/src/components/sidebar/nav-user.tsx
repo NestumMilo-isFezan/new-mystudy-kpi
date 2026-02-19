@@ -1,5 +1,10 @@
 import { useNavigate } from "@tanstack/react-router";
-import { ChevronsUpDown, LogOut, UserRoundCog } from "lucide-react";
+import {
+	ChevronsUpDown,
+	LogOut,
+	ShieldCheck,
+	UserRoundCog,
+} from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -35,7 +40,11 @@ export function NavUser({
 		.join("");
 
 	const handleProfileSettings = async () => {
-		await navigate({ to: "/profile" });
+		await navigate({ to: "/settings/profile" });
+	};
+
+	const handleSecuritySettings = async () => {
+		await navigate({ to: "/settings/user-sessions" });
 	};
 
 	const handleLogout = async () => {
@@ -93,6 +102,10 @@ export function NavUser({
 						<DropdownMenuItem onClick={handleProfileSettings}>
 							<UserRoundCog />
 							Profile Settings
+						</DropdownMenuItem>
+						<DropdownMenuItem onClick={handleSecuritySettings}>
+							<ShieldCheck />
+							Security Settings
 						</DropdownMenuItem>
 						<DropdownMenuItem onClick={handleLogout} disabled={isLogoutPending}>
 							<LogOut />

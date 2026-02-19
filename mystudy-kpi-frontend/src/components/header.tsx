@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { Home, LogIn, LogOut, UserPlus, UserRound } from "lucide-react";
+import { useEffect, useState } from "react";
 
 import { useAuth } from "@/lib/auth/auth-context";
 import { useLogoutAndRedirect } from "@/lib/auth/use-logout-and-redirect";
@@ -11,6 +12,11 @@ const baseNavClass =
 const activeNavClass = "bg-primary text-primary-foreground hover:bg-primary/90";
 
 export default function Header() {
+	const [isMounted, setIsMounted] = useState(false);
+	useEffect(() => {
+		setIsMounted(true);
+	}, []);
+
 	return (
 		<header className="flex items-center justify-between border-b border-border bg-background/95 px-4 py-3 text-foreground shadow-sm backdrop-blur">
 			<h1>
@@ -24,7 +30,14 @@ export default function Header() {
 				</Link>
 			</h1>
 
-			<AuthNav />
+			{isMounted ? (
+				<AuthNav />
+			) : (
+				<nav className="flex items-center gap-2">
+					<div className="h-9 w-20 animate-pulse rounded-lg bg-muted" />
+					<div className="h-9 w-20 animate-pulse rounded-lg bg-muted" />
+				</nav>
+			)}
 		</header>
 	);
 }

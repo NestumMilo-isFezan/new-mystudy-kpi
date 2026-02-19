@@ -22,6 +22,7 @@ class IntakeBatchController extends AbstractController
             $result[] = [
                 'id' => $batch->getId(),
                 'name' => $batch->getName(),
+                'startYear' => $batch->getStartYear(),
                 'isActive' => $batch->isActive(),
             ];
         }
