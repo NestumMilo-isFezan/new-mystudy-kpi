@@ -19,6 +19,22 @@ final class KpiAimResponseSerializer
         ];
     }
 
+    public function serializeSingle(?KpiAim $aim): ?array
+    {
+        if (null === $aim) {
+            return null;
+        }
+
+        return [
+            'id' => $aim->getId(),
+            'targetSetBy' => $aim->getTargetSetBy()->label(),
+            'cgpa' => $aim->getCgpaTarget(),
+            'activities' => $this->normalizeLevelTargets($aim->getActivityTargets()),
+            'competitions' => $this->normalizeLevelTargets($aim->getCompetitionTargets()),
+            'certificates' => $this->normalizeCertificateTargets($aim->getCertificateTargets()),
+        ];
+    }
+
     private function serializePersonal(?KpiAim $aim): ?array
     {
         if (null === $aim) {

@@ -33,6 +33,14 @@ final class MentorshipService
     }
 
     /**
+     * @return array Array of arrays containing 'mentorship', 'menteeCount', and 'mentees' (limited to 5)
+     */
+    public function findAllForIndex(): array
+    {
+        return $this->mentorshipRepository->findAllWithCountsAndLimitedMentees();
+    }
+
+    /**
      * @return Mentorship[]
      */
     public function findByLecturer(User $lecturer): array
@@ -50,12 +58,71 @@ final class MentorshipService
         return $mentorship;
     }
 
+    public function findByIdGlobal(int $id): Mentorship
+    {
+        $mentorship = $this->mentorshipRepository->find($id);
+        if (!$mentorship) {
+            throw new \InvalidArgumentException('Mentorship record not found.');
+        }
+
+        return $mentorship;
+    }
+
+    public function findMenteeByStudentId(string $studentId, User $lecturer): Mentee
+    {
+        $mentee = $this->menteeRepository->findOneByStudentIdAndLecturer($studentId, $lecturer);
+        if (!$mentee) {
+            throw new \InvalidArgumentException('Student not found in your mentorship list.');
+        }
+
+        return $mentee;
+    }
+
+    /**
+     * @return Mentee[]
+     */
+    public function findAllMentees(): array
+    {
+        return $this->menteeRepository->findAll();
+    }
+
+    public function updateMenteeNotes(string $studentId, ?string $notes): Mentee
+    {
+        $student = $this->userRepository->find($studentId);
+        if (!$student) {
+            throw new \InvalidArgumentException('Student not found.');
+        }
+
+        $mentee = $this->menteeRepository->findOneBy(['student' => $student]);
+        if (!$mentee) {
+            throw new \InvalidArgumentException('Student is not assigned to any lecturer.');
+        }
+
+        $mentee->setNotes($notes);
+        $this->entityManager->flush();
+
+        return $mentee;
+    }
+
     /**
      * @return User[]
      */
     public function findAvailableStudents(int $batchId): array
     {
         return $this->userRepository->findAvailableStudentsByBatch($batchId);
+    }
+
+    /**
+     * @param string[] $studentIds
+     */
+    public function createMentorshipForLecturer(string $lecturerId, int $batchId, array $studentIds): Mentorship
+    {
+        $lecturer = $this->userRepository->find($lecturerId);
+        if (!$lecturer || $lecturer->getRole()->value !== \App\Enum\UserRole::LECTURER->value) {
+            throw new \InvalidArgumentException('Lecturer not found.');
+        }
+
+        return $this->createMentorship($lecturer, $batchId, $studentIds);
     }
 
     /**
@@ -128,6 +195,29 @@ final class MentorshipService
         $this->entityManager->remove($mentee);
 
         // If no more mentees in this mentorship record, remove the mentorship record itself
+        if ($mentorship->getMentees()->isEmpty()) {
+            $this->entityManager->remove($mentorship);
+        }
+
+        $this->entityManager->flush();
+    }
+
+    public function removeMenteeByStaff(string $studentId): void
+    {
+        $student = $this->userRepository->find($studentId);
+        if (!$student) {
+            throw new \InvalidArgumentException('Student not found.');
+        }
+
+        $mentee = $this->menteeRepository->findOneBy(['student' => $student]);
+        if (!$mentee) {
+            throw new \InvalidArgumentException('Student is not a mentee.');
+        }
+
+        $mentorship = $mentee->getMentorship();
+        $mentorship->removeMentee($mentee);
+        $this->entityManager->remove($mentee);
+
         if ($mentorship->getMentees()->isEmpty()) {
             $this->entityManager->remove($mentorship);
         }

@@ -11,6 +11,9 @@ final class MentorshipAssignDto
     #[Assert\NotBlank]
     public int $batchId;
 
+    #[Assert\Uuid]
+    public ?string $lecturerId = null;
+
     /**
      * @var string[]
      */

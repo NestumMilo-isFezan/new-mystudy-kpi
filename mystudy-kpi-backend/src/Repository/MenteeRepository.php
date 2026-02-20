@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Repository;
 
 use App\Entity\Mentee;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -21,6 +22,18 @@ class MenteeRepository extends ServiceEntityRepository
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Mentee::class);
+    }
+
+    public function findOneByStudentIdAndLecturer(string $studentId, User $lecturer): ?Mentee
+    {
+        return $this->createQueryBuilder('m')
+            ->join('m.mentorship', 'ms')
+            ->where('m.student = :studentId')
+            ->andWhere('ms.lecturer = :lecturer')
+            ->setParameter('studentId', $studentId)
+            ->setParameter('lecturer', $lecturer)
+            ->getQuery()
+            ->getOneOrNullResult();
     }
 
     public function save(Mentee $entity, bool $flush = false): void

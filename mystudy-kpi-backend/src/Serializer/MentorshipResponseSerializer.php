@@ -16,6 +16,7 @@ final class MentorshipResponseSerializer
     public function serialize(Mentorship $mentorship, ?array $mentees = null, ?int $menteeCount = null): array
     {
         $batch = $mentorship->getIntakeBatch();
+        $lecturer = $mentorship->getLecturer();
         $isIndexPreview = $mentees !== null;
 
         // If mentees are provided (e.g., pre-fetched top 5 for index), use them
@@ -36,6 +37,7 @@ final class MentorshipResponseSerializer
                 'name' => $batch->getName(),
                 'startYear' => $batch->getStartYear(),
             ],
+            'lecturer' => $this->userSerializer->serialize($lecturer),
             'menteeCount' => $count,
             'mentees' => $menteeDtos,
         ];
@@ -45,6 +47,7 @@ final class MentorshipResponseSerializer
     {
         $allMentees = $this->getMentees($mentorship);
         $batch = $mentorship->getIntakeBatch();
+        $lecturer = $mentorship->getLecturer();
 
         return [
             'id' => $mentorship->getId(),
@@ -53,6 +56,7 @@ final class MentorshipResponseSerializer
                 'name' => $batch->getName(),
                 'startYear' => $batch->getStartYear(),
             ],
+            'lecturer' => $this->userSerializer->serialize($lecturer),
             'menteeCount' => count($allMentees),
             'mentees' => $this->mapMenteeEntitiesToDtos($allMentees),
         ];
