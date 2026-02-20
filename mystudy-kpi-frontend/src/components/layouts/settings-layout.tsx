@@ -1,6 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { ChevronDown, ShieldCheck, User } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -50,18 +49,16 @@ export default function SettingsLayout({
 			{/* Mobile Nav */}
 			<div className="md:hidden">
 				<DropdownMenu>
-					<DropdownMenuTrigger asChild>
-						<Button variant="outline" className="w-full justify-between">
-							<span className="flex items-center gap-2">
-								<activeItem.icon className="size-4" />
-								{activeItem.title}
-							</span>
-							<ChevronDown className="size-4 opacity-50" />
-						</Button>
+					<DropdownMenuTrigger className="border-border bg-background hover:bg-muted hover:text-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50 aria-expanded:bg-muted aria-expanded:text-foreground shadow-xs inline-flex h-9 w-full items-center justify-between rounded-md border px-2.5 text-sm font-medium">
+						<span className="flex items-center gap-2">
+							<activeItem.icon className="size-4" />
+							{activeItem.title}
+						</span>
+						<ChevronDown className="size-4 opacity-50" />
 					</DropdownMenuTrigger>
 					<DropdownMenuContent className="w-[--radix-dropdown-menu-trigger-width]">
 						{settingsNavItems.map((item) => (
-							<DropdownMenuItem key={item.href} asChild>
+							<DropdownMenuItem key={item.href}>
 								<Link
 									to={item.href}
 									className={cn(

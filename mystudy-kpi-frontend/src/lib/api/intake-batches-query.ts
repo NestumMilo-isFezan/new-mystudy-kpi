@@ -8,14 +8,14 @@ import {
 export type { IntakeBatch };
 
 export const intakeBatchesQueryOptions = queryOptions({
-	queryKey: ["intake-batches"],
+	queryKey: ["intake-batches"] as const,
 	queryFn: () => getIntakeBatchesFn(),
 	staleTime: 5 * 60 * 1000, // 5 minutes
 	retry: false,
 });
 
 export const allIntakeBatchesQueryOptions = queryOptions({
-	queryKey: ["admin", "intake-batches"],
+	queryKey: ["admin", "intake-batches"] as const,
 	queryFn: () => getAllIntakeBatchesFn(),
 	staleTime: 5 * 60 * 1000, // 5 minutes
 	retry: false,

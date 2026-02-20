@@ -1,4 +1,4 @@
-import { KpiRecordActionGroup } from "@/components/pages/manage-kpi-records/kpi-record-action-group";
+import type { ComponentType } from "react";
 import { BadgeCell } from "@/components/table/data/badge-cell";
 import {
 	Card,
@@ -23,11 +23,17 @@ const categoryMap: Record<number, string> = {
 	1: "Technical",
 };
 
-type KpiRecordCardProps = {
+type ActionGroupProps = {
 	record: KpiRecord;
+	variant: "card" | "cell";
 };
 
-export function KpiRecordCard({ record }: KpiRecordCardProps) {
+type KpiRecordCardProps = {
+	record: KpiRecord;
+	ActionGroup: ComponentType<ActionGroupProps>;
+};
+
+export function KpiRecordCard({ record, ActionGroup }: KpiRecordCardProps) {
 	const achievementLabel =
 		record.type === "certification"
 			? categoryMap[record.category ?? 0]
@@ -39,7 +45,7 @@ export function KpiRecordCard({ record }: KpiRecordCardProps) {
 				<CardTitle className="line-clamp-1">{record.title}</CardTitle>
 				<CardDescription>{record.semester.termString}</CardDescription>
 				<CardAction>
-					<KpiRecordActionGroup record={record} variant="card" />
+					<ActionGroup record={record} variant="card" />
 				</CardAction>
 			</CardHeader>
 			<CardContent className="pt-0 flex flex-col gap-2">

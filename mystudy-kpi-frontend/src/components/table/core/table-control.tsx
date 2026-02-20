@@ -253,7 +253,9 @@ export function TableControl<TData>({
 	const controls = useTableControl({ data, columns, config, isMobile });
 
 	return (
-		<TableControlContext.Provider value={controls}>
+		<TableControlContext.Provider
+			value={controls as TableControlState<unknown>}
+		>
 			{children}
 		</TableControlContext.Provider>
 	);

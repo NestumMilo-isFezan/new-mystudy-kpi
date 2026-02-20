@@ -6,7 +6,7 @@ import { IntakeTableSkeleton } from "@/components/pages/manage-intake/intake-tab
 import { Button } from "@/components/ui/button";
 import { allIntakeBatchesQueryOptions } from "@/lib/api/intake-batches-query";
 
-export const Route = createFileRoute("/_auth/_staff/staff/intakes")({
+export const Route = createFileRoute("/_auth/_staff/staff/intake/")({
 	loader: async ({ context }) => {
 		await context.queryClient.ensureQueryData(allIntakeBatchesQueryOptions);
 	},
@@ -14,7 +14,7 @@ export const Route = createFileRoute("/_auth/_staff/staff/intakes")({
 	component: ManageIntakePage,
 });
 
-function IntakesErrorComponent({ error }: { error: unknown }) {
+function IntakesErrorComponent({ error }: { error: Error }) {
 	const router = useRouter();
 
 	return (

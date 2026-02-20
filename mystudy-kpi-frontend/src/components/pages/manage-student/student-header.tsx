@@ -14,7 +14,7 @@ export function StudentHeader() {
 			description:
 				"Create a new student account. They will be assigned to the selected intake batch.",
 			Content: StudentCreateForm,
-			payload: {},
+			payload: undefined,
 		});
 	}, [modal]);
 

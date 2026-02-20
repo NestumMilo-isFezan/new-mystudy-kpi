@@ -24,10 +24,12 @@ export function IntakeBatchSelector({
 	source = "all",
 	disabled = false,
 }: IntakeBatchSelectorProps) {
-	const { data: batches } = useSuspenseQuery(
+	const queryOptions =
 		source === "active"
 			? intakeBatchesQueryOptions
-			: allIntakeBatchesQueryOptions,
+			: allIntakeBatchesQueryOptions;
+	const { data: batches } = useSuspenseQuery(
+		queryOptions as typeof intakeBatchesQueryOptions,
 	);
 
 	const stringValue = value ? value.toString() : "";
@@ -36,7 +38,7 @@ export function IntakeBatchSelector({
 	return (
 		<Select
 			value={stringValue}
-			onValueChange={(val) => onChange(Number(val))}
+			onValueChange={(val) => onChange(Number(val ?? 0))}
 			disabled={disabled}
 		>
 			<SelectTrigger className="w-full">

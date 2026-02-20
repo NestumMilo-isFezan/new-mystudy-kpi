@@ -1,4 +1,4 @@
-import { Link } from "@tanstack/react-router";
+import { Link, type LinkProps } from "@tanstack/react-router";
 import { ArrowLeft, GraduationCap, UserPlus } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
@@ -8,6 +8,7 @@ type MentorshipHeaderProps = {
 	onActionClick?: () => void;
 	title?: string;
 	description?: string;
+	rootPath?: LinkProps["to"];
 };
 
 export function MentorshipHeader({
@@ -15,6 +16,7 @@ export function MentorshipHeader({
 	onActionClick,
 	title: customTitle,
 	description: customDescription,
+	rootPath = "/mentorship",
 }: MentorshipHeaderProps) {
 	const defaultTitle = mode === "assign" ? "Assign Students" : "My Mentees";
 	const defaultDescription =
@@ -30,7 +32,7 @@ export function MentorshipHeader({
 			<div className="flex w-full flex-col gap-2 md:w-auto md:flex-row">
 				{mode === "index" && (
 					<Link
-						to="/mentorship/assign"
+						to={`${rootPath as string}/assign` as LinkProps["to"]}
 						className={`${buttonVariants({ variant: "default" })} w-full md:w-auto`}
 					>
 						<UserPlus className="mr-2 size-4" />
@@ -41,7 +43,7 @@ export function MentorshipHeader({
 				{mode === "assign" && (
 					<>
 						<Link
-							to="/mentorship"
+							to={rootPath}
 							className={`${buttonVariants({ variant: "outline" })} w-full md:w-auto`}
 						>
 							<ArrowLeft className="mr-2 size-4" />
@@ -61,7 +63,7 @@ export function MentorshipHeader({
 				{mode === "detail" && (
 					<>
 						<Link
-							to="/mentorship"
+							to={rootPath}
 							className={`${buttonVariants({ variant: "outline" })} w-full md:w-auto`}
 						>
 							<ArrowLeft className="mr-2 size-4" />

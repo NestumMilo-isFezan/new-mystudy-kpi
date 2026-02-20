@@ -1,5 +1,5 @@
 import type { ColumnDef } from "@tanstack/react-table";
-import { StudentActionMenu } from "@/components/pages/manage-student/student-action-menu";
+import { StudentActionGroup } from "@/components/pages/manage-student/student-action-group";
 import { DataCell } from "@/components/table/data/cell";
 import { HeaderCell } from "@/components/table/header/cell";
 import { SortCell } from "@/components/table/header/sort-cell";
@@ -68,7 +68,7 @@ export const getStudentTableColumns = (): ColumnDef<Student>[] => [
 			</HeaderCell>
 		),
 		cell: ({ row }) => (
-			<StudentActionMenu student={row.original} variant="cell" />
+			<StudentActionGroup student={row.original} variant="cell" />
 		),
 		enableSorting: false,
 		enableColumnFilter: false,

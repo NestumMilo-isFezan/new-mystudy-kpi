@@ -2,6 +2,20 @@ import { createServerFn } from "@tanstack/react-start";
 import { getCookie, getRequestUrl } from "@tanstack/react-start/server";
 import ky from "ky";
 import { z } from "zod";
+import type { AcademicRecord } from "./academics.functions";
+import type { Challenge } from "./challenges.functions";
+import type {
+	CertificateTargets,
+	KpiAimResponse,
+	LevelTargets,
+} from "./kpi-aim.functions";
+import type { KpiRecord } from "./kpi-records.functions";
+import type { KpiSummaryResponse } from "./kpi-summary.functions";
+import {
+	positiveIntSchema,
+	saveKpiAimPayloadSchema,
+	uuidSchema,
+} from "./schemas";
 import type { Student, StudentCreateInput } from "./students.functions";
 
 export type Mentorship = {
@@ -11,17 +25,34 @@ export type Mentorship = {
 		name: string;
 		startYear: number;
 	};
+	lecturer?: {
+		id: string;
+		identifier: string;
+		firstName: string;
+		lastName: string;
+	};
 	menteeCount: number;
 	mentees: Student[];
 };
+
+export type SerializedKpiAim = {
+	id: number;
+	targetSetBy: "personal" | "lecturer" | "faculty";
+	cgpa: string;
+	activities: LevelTargets;
+	competitions: LevelTargets;
+	certificates: CertificateTargets;
+};
+
+export type StudentOverview = {
+	student: Student;
+} & KpiSummaryResponse;
 
 export type MentorshipAssignInput = {
 	batchId: number;
 	studentIds: string[];
 };
 
-const positiveIntSchema = z.number().int().positive();
-const uuidSchema = z.string().uuid();
 const mentorshipAssignInputSchema = z.object({
 	batchId: positiveIntSchema,
 	studentIds: z.array(uuidSchema).min(1),
@@ -56,6 +87,204 @@ export const getLecturerMentorshipsFn = createServerFn({
 		.json<Mentorship[]>();
 });
 
+export const getAdminMentorshipsFn = createServerFn({
+	method: "GET",
+}).handler(async () => {
+	const authToken = getCookie("AUTH_TOKEN");
+	return await ky
+		.get(`${getApiBaseUrl()}/api/admin/mentorships`, {
+			headers: {
+				Accept: "application/json",
+				Cookie: `AUTH_TOKEN=${authToken}`,
+			},
+		})
+		.json<Mentorship[]>();
+});
+
+export const getAdminMentorshipByIdFn = createServerFn({
+	method: "GET",
+})
+	.inputValidator((id: number) => positiveIntSchema.parse(id))
+	.handler(async ({ data: id }) => {
+		const authToken = getCookie("AUTH_TOKEN");
+		return await ky
+			.get(`${getApiBaseUrl()}/api/admin/mentorships/${id}`, {
+				headers: {
+					Accept: "application/json",
+					Cookie: `AUTH_TOKEN=${authToken}`,
+				},
+			})
+			.json<Mentorship>();
+	});
+
+export const assignMenteesAdminFn = createServerFn({ method: "POST" })
+	.inputValidator((data: MentorshipAssignInput & { lecturerId: string }) =>
+		z
+			.object({
+				batchId: positiveIntSchema,
+				studentIds: z.array(uuidSchema).min(1),
+				lecturerId: uuidSchema,
+			})
+			.parse(data),
+	)
+	.handler(async ({ data }) => {
+		const authToken = getCookie("AUTH_TOKEN");
+		return await ky
+			.post(`${getApiBaseUrl()}/api/admin/mentorships`, {
+				json: data,
+				headers: {
+					Accept: "application/json",
+					Cookie: `AUTH_TOKEN=${authToken}`,
+				},
+			})
+			.json<{ message: string; mentorship: Mentorship }>();
+	});
+
+export const getMentorshipStudentOverviewFn = createServerFn({
+	method: "GET",
+})
+	.inputValidator((id: string) => uuidSchema.parse(id))
+	.handler(async ({ data: id }) => {
+		const authToken = getCookie("AUTH_TOKEN");
+		return await ky
+			.get(
+				`${getApiBaseUrl()}/api/lecturer/mentorships/students/${id}/overview`,
+				{
+					headers: {
+						Accept: "application/json",
+						Cookie: `AUTH_TOKEN=${authToken}`,
+					},
+				},
+			)
+			.json<StudentOverview>();
+	});
+
+export const getMentorshipStudentAcademicsFn = createServerFn({
+	method: "GET",
+})
+	.inputValidator((id: string) => uuidSchema.parse(id))
+	.handler(async ({ data: id }) => {
+		const authToken = getCookie("AUTH_TOKEN");
+		return await ky
+			.get(
+				`${getApiBaseUrl()}/api/lecturer/mentorships/students/${id}/academics`,
+				{
+					headers: {
+						Accept: "application/json",
+						Cookie: `AUTH_TOKEN=${authToken}`,
+					},
+				},
+			)
+			.json<AcademicRecord[]>();
+	});
+
+export const getMentorshipStudentKpiRecordsFn = createServerFn({
+	method: "GET",
+})
+	.inputValidator((id: string) => uuidSchema.parse(id))
+	.handler(async ({ data: id }) => {
+		const authToken = getCookie("AUTH_TOKEN");
+		return await ky
+			.get(
+				`${getApiBaseUrl()}/api/lecturer/mentorships/students/${id}/kpi-records`,
+				{
+					headers: {
+						Accept: "application/json",
+						Cookie: `AUTH_TOKEN=${authToken}`,
+					},
+				},
+			)
+			.json<KpiRecord[]>();
+	});
+
+export const getMentorshipStudentChallengesFn = createServerFn({
+	method: "GET",
+})
+	.inputValidator((id: string) => uuidSchema.parse(id))
+	.handler(async ({ data: id }) => {
+		const authToken = getCookie("AUTH_TOKEN");
+		return await ky
+			.get(
+				`${getApiBaseUrl()}/api/lecturer/mentorships/students/${id}/challenges`,
+				{
+					headers: {
+						Accept: "application/json",
+						Cookie: `AUTH_TOKEN=${authToken}`,
+					},
+				},
+			)
+			.json<Challenge[]>();
+	});
+
+export const getMentorshipStudentKpiTargetFn = createServerFn({
+	method: "GET",
+})
+	.inputValidator((id: string) => uuidSchema.parse(id))
+	.handler(async ({ data: id }) => {
+		const authToken = getCookie("AUTH_TOKEN");
+		return await ky
+			.get(
+				`${getApiBaseUrl()}/api/lecturer/mentorships/students/${id}/kpi-target`,
+				{
+					headers: {
+						Accept: "application/json",
+						Cookie: `AUTH_TOKEN=${authToken}`,
+					},
+				},
+			)
+			.json<KpiAimResponse>();
+	});
+
+export const updateMenteeKpiTargetFn = createServerFn({
+	method: "POST",
+})
+	.inputValidator(
+		z.object({
+			studentId: uuidSchema,
+			payload: saveKpiAimPayloadSchema,
+		}),
+	)
+	.handler(async ({ data: { studentId, payload } }) => {
+		const authToken = getCookie("AUTH_TOKEN");
+		return await ky
+			.post(
+				`${getApiBaseUrl()}/api/lecturer/mentorships/students/${studentId}/kpi-target`,
+				{
+					json: payload,
+					headers: {
+						Accept: "application/json",
+						Cookie: `AUTH_TOKEN=${authToken}`,
+					},
+				},
+			)
+			.json<{ message: string; aim: SerializedKpiAim }>();
+	});
+
+export const updateStandardKpiTargetFn = createServerFn({
+	method: "POST",
+})
+	.inputValidator(
+		z.object({
+			batchId: positiveIntSchema,
+			payload: saveKpiAimPayloadSchema,
+		}),
+	)
+	.handler(async ({ data: { batchId, payload } }) => {
+		const authToken = getCookie("AUTH_TOKEN");
+		return await ky
+			.post(
+				`${getApiBaseUrl()}/api/admin/mentorships/standard-aims/${batchId}`,
+				{
+					json: payload,
+					headers: {
+						Accept: "application/json",
+						Cookie: `AUTH_TOKEN=${authToken}`,
+					},
+				},
+			)
+			.json<{ message: string; aim: SerializedKpiAim }>();
+	});
+
 export const getLecturerMentorshipByIdFn = createServerFn({
 	method: "GET",
 })
@@ -89,6 +318,23 @@ export const getAvailableStudentsFn = createServerFn({ method: "GET" })
 			.json<Student[]>();
 	});
 
+export const getAvailableStudentsAdminFn = createServerFn({ method: "GET" })
+	.inputValidator((batchId: number) => positiveIntSchema.parse(batchId))
+	.handler(async ({ data: batchId }) => {
+		const authToken = getCookie("AUTH_TOKEN");
+		return await ky
+			.get(
+				`${getApiBaseUrl()}/api/admin/mentorships/available-students/${batchId}`,
+				{
+					headers: {
+						Accept: "application/json",
+						Cookie: `AUTH_TOKEN=${authToken}`,
+					},
+				},
+			)
+			.json<Student[]>();
+	});
+
 export const assignMenteesFn = createServerFn({ method: "POST" })
 	.inputValidator((data: MentorshipAssignInput) =>
 		mentorshipAssignInputSchema.parse(data),
@@ -112,6 +358,20 @@ export const deleteMenteeFn = createServerFn({ method: "POST" })
 		const authToken = getCookie("AUTH_TOKEN");
 		return await ky
 			.delete(`${getApiBaseUrl()}/api/lecturer/mentorships/mentees/${id}`, {
+				headers: {
+					Accept: "application/json",
+					Cookie: `AUTH_TOKEN=${authToken}`,
+				},
+			})
+			.json<{ message: string }>();
+	});
+
+export const deleteMenteeAdminFn = createServerFn({ method: "POST" })
+	.inputValidator((id: string) => uuidSchema.parse(id))
+	.handler(async ({ data: id }) => {
+		const authToken = getCookie("AUTH_TOKEN");
+		return await ky
+			.delete(`${getApiBaseUrl()}/api/admin/mentorships/mentees/${id}`, {
 				headers: {
 					Accept: "application/json",
 					Cookie: `AUTH_TOKEN=${authToken}`,

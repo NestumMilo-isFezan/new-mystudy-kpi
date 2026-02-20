@@ -25,7 +25,7 @@ export function useAcademicsMutations() {
 	});
 
 	const updateGpaMutation = useMutation({
-		mutationFn: (payload: { id: number; gpa: string }) =>
+		mutationFn: (payload: { id: number; gpa: string | null }) =>
 			updateGpa({ data: payload }),
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ["academics"] });

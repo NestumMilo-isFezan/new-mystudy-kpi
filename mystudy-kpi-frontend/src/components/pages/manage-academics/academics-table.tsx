@@ -1,6 +1,10 @@
-import { useSuspenseQuery } from "@tanstack/react-query";
+import {
+	type UseSuspenseQueryOptions,
+	useSuspenseQuery,
+} from "@tanstack/react-query";
 import type { Row } from "@tanstack/react-table";
-import { useMemo } from "react";
+import { type ComponentType, useMemo } from "react";
+import { AcademicActionGroup } from "@/components/pages/manage-academics/academic-action-group";
 import { AcademicCard } from "@/components/pages/manage-academics/academic-card";
 import { getAcademicTableColumns } from "@/components/pages/manage-academics/academics-table-columns";
 import { academicsTableControlConfig } from "@/components/pages/manage-academics/academics-table-control";
@@ -15,10 +19,28 @@ import {
 	academicsQueryOptions,
 } from "@/lib/api/academics-query";
 
-export function AcademicsTable() {
-	const { data: academics } = useSuspenseQuery(academicsQueryOptions);
+type ActionGroupProps = {
+	record: AcademicRecord;
+	variant: "card" | "cell";
+};
 
-	const columns = useMemo(() => getAcademicTableColumns(), []);
+type AcademicsTableProps = {
+	ActionGroup?: ComponentType<ActionGroupProps>;
+	queryOptions?: unknown;
+};
+
+export function AcademicsTable({
+	ActionGroup = AcademicActionGroup,
+	queryOptions: customQueryOptions = academicsQueryOptions,
+}: AcademicsTableProps) {
+	const { data: academics } = useSuspenseQuery(
+		customQueryOptions as UseSuspenseQueryOptions<AcademicRecord[]>,
+	);
+
+	const columns = useMemo(
+		() => getAcademicTableColumns(ActionGroup),
+		[ActionGroup],
+	);
 
 	return (
 		<TableControl
@@ -33,13 +55,17 @@ export function AcademicsTable() {
 					<CoreTable emptyMessage="No academic records match your filters." />
 				</div>
 
-				<AcademicMobileList />
+				<AcademicMobileList ActionGroup={ActionGroup} />
 			</div>
 		</TableControl>
 	);
 }
 
-function AcademicMobileList() {
+function AcademicMobileList({
+	ActionGroup,
+}: {
+	ActionGroup: ComponentType<ActionGroupProps>;
+}) {
 	const { table } = useTableContext<AcademicRecord>();
 	const currentRows = table.getRowModel().rows;
 
@@ -47,7 +73,11 @@ function AcademicMobileList() {
 		<div className="space-y-3 md:hidden">
 			{currentRows.length > 0 ? (
 				currentRows.map((row: Row<AcademicRecord>) => (
-					<AcademicCard key={row.id} record={row.original} />
+					<AcademicCard
+						key={row.id}
+						record={row.original}
+						ActionGroup={ActionGroup}
+					/>
 				))
 			) : (
 				<div className="rounded-xl border border-border bg-card p-6 text-center text-sm text-muted-foreground">

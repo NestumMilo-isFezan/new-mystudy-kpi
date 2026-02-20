@@ -1,4 +1,4 @@
-import { Link } from "@tanstack/react-router";
+import { Link, type LinkProps } from "@tanstack/react-router";
 import { ChevronRight, UserMinus } from "lucide-react";
 import { useCallback } from "react";
 import { ConfirmationModalContent } from "@/components/modal/confirmation-modal";
@@ -21,11 +21,19 @@ import type { Student } from "@/lib/api/students.functions";
 
 type MenteeSubTableProps = {
 	mentorship: Mentorship;
+	rootPath?: string;
 };
 
-export function MenteeSubTable({ mentorship }: MenteeSubTableProps) {
+export function MenteeSubTable({
+	mentorship,
+	rootPath = "/mentorship",
+}: MenteeSubTableProps) {
 	const modal = useModal();
-	const { removeMenteeMutation } = useMentorshipMutations();
+	const { removeMenteeMutation, removeMenteeAdminMutation } =
+		useMentorshipMutations();
+	const activeMutation = String(rootPath).startsWith("/staff")
+		? removeMenteeAdminMutation
+		: removeMenteeMutation;
 
 	const handleRemoveMentee = useCallback(
 		(student: Student) => {
@@ -35,13 +43,14 @@ export function MenteeSubTable({ mentorship }: MenteeSubTableProps) {
 				size: "sm",
 				Content: ConfirmationModalContent,
 				payload: {
-					onConfirm: () => removeMenteeMutation.mutate(student.id),
+					onConfirm: () => activeMutation.mutate(student.id),
 					confirmLabel: "Remove",
 					variant: "destructive",
+					isPending: activeMutation.isPending,
 				},
 			});
 		},
-		[modal, removeMenteeMutation],
+		[activeMutation, modal],
 	);
 
 	const displayedMentees = mentorship.mentees.slice(0, 5);
@@ -118,8 +127,7 @@ export function MenteeSubTable({ mentorship }: MenteeSubTableProps) {
 					<TableRow className="hover:bg-muted/30 transition-colors">
 						<TableCell colSpan={4} className="p-0">
 							<Link
-								to="/mentorship/$mentorshipId"
-								params={{ mentorshipId: String(mentorship.id) }}
+								to={`${rootPath}/${String(mentorship.id)}` as LinkProps["to"]}
 								className="flex items-center justify-center py-2 text-xs font-semibold text-primary gap-1"
 							>
 								View All {mentorship.menteeCount} Mentees

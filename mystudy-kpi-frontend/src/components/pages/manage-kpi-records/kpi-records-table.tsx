@@ -1,6 +1,10 @@
-import { useSuspenseQuery } from "@tanstack/react-query";
+import {
+	type UseSuspenseQueryOptions,
+	useSuspenseQuery,
+} from "@tanstack/react-query";
 import type { Row } from "@tanstack/react-table";
-import { useMemo } from "react";
+import { type ComponentType, useMemo } from "react";
+import { KpiRecordActionGroup } from "@/components/pages/manage-kpi-records/kpi-record-action-group";
 import { KpiRecordCard } from "@/components/pages/manage-kpi-records/kpi-record-card";
 import { getKpiRecordTableColumns } from "@/components/pages/manage-kpi-records/kpi-records-table-columns";
 import { getKpiRecordsTableConfig } from "@/components/pages/manage-kpi-records/kpi-records-table-control";
@@ -15,18 +19,40 @@ import {
 	kpiRecordsQueryOptions,
 } from "@/lib/api/kpi-records-query";
 
-export function KpiRecordsTable({ filterType }: { filterType?: string }) {
-	const { data: records } = useSuspenseQuery(kpiRecordsQueryOptions);
+type ActionGroupProps = {
+	record: KpiRecord;
+	variant: "card" | "cell";
+};
+
+type KpiRecordsTableProps = {
+	filterType?: string;
+	ActionGroup?: ComponentType<ActionGroupProps>;
+	queryOptions?: unknown;
+	isLecturerMentee?: boolean;
+};
+
+export function KpiRecordsTable({
+	filterType,
+	ActionGroup = KpiRecordActionGroup,
+	queryOptions: customQueryOptions = kpiRecordsQueryOptions,
+	isLecturerMentee = false,
+}: KpiRecordsTableProps) {
+	const { data: records } = useSuspenseQuery(
+		customQueryOptions as UseSuspenseQueryOptions<KpiRecord[]>,
+	);
 
 	const filteredRecords = useMemo(() => {
 		if (!filterType) return records;
 		return records.filter((r) => r.type === filterType);
 	}, [records, filterType]);
 
-	const columns = useMemo(() => getKpiRecordTableColumns(), []);
+	const columns = useMemo(
+		() => getKpiRecordTableColumns(ActionGroup),
+		[ActionGroup],
+	);
 	const config = useMemo(
-		() => getKpiRecordsTableConfig(filterType),
-		[filterType],
+		() => getKpiRecordsTableConfig(filterType, isLecturerMentee),
+		[filterType, isLecturerMentee],
 	);
 
 	return (
@@ -38,13 +64,17 @@ export function KpiRecordsTable({ filterType }: { filterType?: string }) {
 					<CoreTable emptyMessage="No KPI records match your filters." />
 				</div>
 
-				<KpiRecordMobileList />
+				<KpiRecordMobileList ActionGroup={ActionGroup} />
 			</div>
 		</TableControl>
 	);
 }
 
-function KpiRecordMobileList() {
+function KpiRecordMobileList({
+	ActionGroup,
+}: {
+	ActionGroup: ComponentType<ActionGroupProps>;
+}) {
 	const { table } = useTableContext<KpiRecord>();
 	const currentRows = table.getRowModel().rows;
 
@@ -52,7 +82,11 @@ function KpiRecordMobileList() {
 		<div className="space-y-3 md:hidden">
 			{currentRows.length > 0 ? (
 				currentRows.map((row: Row<KpiRecord>) => (
-					<KpiRecordCard key={row.id} record={row.original} />
+					<KpiRecordCard
+						key={row.id}
+						record={row.original}
+						ActionGroup={ActionGroup}
+					/>
 				))
 			) : (
 				<div className="rounded-xl border border-border bg-card p-6 text-center text-sm text-muted-foreground">

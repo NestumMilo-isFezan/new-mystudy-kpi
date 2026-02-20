@@ -38,20 +38,26 @@ const navMainItems: NavMainItemWithRoles[] = [
 		],
 	},
 	{
-		title: "Mentorships",
+		title: "Mentorship",
 		url: "/mentorship",
 		icon: UsersRound,
-		roles: ["lecturer", "staff"],
+		roles: ["lecturer"],
+	},
+	{
+		title: "Manage Mentorship",
+		url: "/staff/mentorships",
+		icon: UsersRound,
+		roles: ["staff"],
 	},
 	{
 		title: "Staff Utilities",
-		url: "/staff/intakes",
+		url: "/staff/intake",
 		icon: Wrench,
 		roles: ["staff"],
 		items: [
-			{ title: "Manage Intakes", url: "/staff/intakes" },
+			{ title: "Manage Intakes", url: "/staff/intake" },
 			{ title: "Manage Lecturers", url: "/staff/manage-lecturers" },
-			{ title: "Manage Students", url: "/staff/manage-students" },
+			{ title: "Manage Students", url: "/staff/students" },
 		],
 	},
 ];

@@ -1,6 +1,11 @@
 import { createServerFn } from "@tanstack/react-start";
 import { getCookie, getRequestUrl } from "@tanstack/react-start/server";
 import ky from "ky";
+import type { AcademicRecord } from "./academics.functions";
+import type { Challenge } from "./challenges.functions";
+import type { KpiAimResponse } from "./kpi-aim.functions";
+import type { KpiRecord } from "./kpi-records.functions";
+import type { KpiSummaryResponse } from "./kpi-summary.functions";
 
 export type Student = {
 	id: string;
@@ -15,6 +20,10 @@ export type Student = {
 		startYear: number;
 	} | null;
 };
+
+export type StudentOverview = {
+	student: Student;
+} & KpiSummaryResponse;
 
 export type StudentCreateInput = {
 	identifier: string;
@@ -55,6 +64,86 @@ export const getAllStudentsFn = createServerFn({ method: "GET" }).handler(
 			.json<Student[]>();
 	},
 );
+
+export const getAdminStudentOverviewFn = createServerFn({
+	method: "GET",
+})
+	.inputValidator((id: string) => id)
+	.handler(async ({ data: id }) => {
+		const authToken = getCookie("AUTH_TOKEN");
+		return await ky
+			.get(`${getApiBaseUrl()}/api/admin/students/${id}/overview`, {
+				headers: {
+					Accept: "application/json",
+					Cookie: `AUTH_TOKEN=${authToken}`,
+				},
+			})
+			.json<StudentOverview>();
+	});
+
+export const getAdminStudentAcademicsFn = createServerFn({
+	method: "GET",
+})
+	.inputValidator((id: string) => id)
+	.handler(async ({ data: id }) => {
+		const authToken = getCookie("AUTH_TOKEN");
+		return await ky
+			.get(`${getApiBaseUrl()}/api/admin/students/${id}/academics`, {
+				headers: {
+					Accept: "application/json",
+					Cookie: `AUTH_TOKEN=${authToken}`,
+				},
+			})
+			.json<AcademicRecord[]>();
+	});
+
+export const getAdminStudentKpiRecordsFn = createServerFn({
+	method: "GET",
+})
+	.inputValidator((id: string) => id)
+	.handler(async ({ data: id }) => {
+		const authToken = getCookie("AUTH_TOKEN");
+		return await ky
+			.get(`${getApiBaseUrl()}/api/admin/students/${id}/kpi-records`, {
+				headers: {
+					Accept: "application/json",
+					Cookie: `AUTH_TOKEN=${authToken}`,
+				},
+			})
+			.json<KpiRecord[]>();
+	});
+
+export const getAdminStudentChallengesFn = createServerFn({
+	method: "GET",
+})
+	.inputValidator((id: string) => id)
+	.handler(async ({ data: id }) => {
+		const authToken = getCookie("AUTH_TOKEN");
+		return await ky
+			.get(`${getApiBaseUrl()}/api/admin/students/${id}/challenges`, {
+				headers: {
+					Accept: "application/json",
+					Cookie: `AUTH_TOKEN=${authToken}`,
+				},
+			})
+			.json<Challenge[]>();
+	});
+
+export const getAdminStudentKpiTargetFn = createServerFn({
+	method: "GET",
+})
+	.inputValidator((id: string) => id)
+	.handler(async ({ data: id }) => {
+		const authToken = getCookie("AUTH_TOKEN");
+		return await ky
+			.get(`${getApiBaseUrl()}/api/admin/students/${id}/kpi-target`, {
+				headers: {
+					Accept: "application/json",
+					Cookie: `AUTH_TOKEN=${authToken}`,
+				},
+			})
+			.json<KpiAimResponse>();
+	});
 
 export const createStudentFn = createServerFn({ method: "POST" })
 	.inputValidator((data: StudentCreateInput) => data)

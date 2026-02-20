@@ -13,10 +13,14 @@ import type { Student } from "@/lib/api/students.functions";
 
 type MenteeTableProps = {
 	mentees: Student[];
+	rootPath?: string;
 };
 
-export function MenteeTable({ mentees }: MenteeTableProps) {
-	const columns = useMemo(() => getMenteeTableColumns(), []);
+export function MenteeTable({
+	mentees,
+	rootPath = "/mentorship",
+}: MenteeTableProps) {
+	const columns = useMemo(() => getMenteeTableColumns(rootPath), [rootPath]);
 	const config = useMemo(() => getMenteeTableControlConfig(), []);
 
 	return (
@@ -28,13 +32,13 @@ export function MenteeTable({ mentees }: MenteeTableProps) {
 					<CoreTable emptyMessage="No students match your filters." />
 				</div>
 
-				<MenteeMobileList />
+				<MenteeMobileList rootPath={rootPath} />
 			</div>
 		</TableControl>
 	);
 }
 
-function MenteeMobileList() {
+function MenteeMobileList({ rootPath }: { rootPath: string }) {
 	const { table } = useTableContext<Student>();
 	const currentRows = table.getRowModel().rows;
 
@@ -42,7 +46,7 @@ function MenteeMobileList() {
 		<div className="space-y-3 md:hidden">
 			{currentRows.length > 0 ? (
 				currentRows.map((row: Row<Student>) => (
-					<MenteeCard key={row.id} student={row.original} />
+					<MenteeCard key={row.id} student={row.original} rootPath={rootPath} />
 				))
 			) : (
 				<div className="rounded-xl border border-border bg-card p-6 text-center text-sm text-muted-foreground">

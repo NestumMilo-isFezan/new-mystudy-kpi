@@ -4,7 +4,7 @@ import { type AcademicRecord, getAcademicsFn } from "./academics.functions";
 export type { AcademicRecord };
 
 export const academicsQueryOptions = queryOptions({
-	queryKey: ["academics"],
+	queryKey: ["academics"] as const,
 	queryFn: () => getAcademicsFn(),
 	staleTime: 5 * 60 * 1000, // 5 minutes
 	retry: false,

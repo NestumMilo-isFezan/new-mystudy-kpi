@@ -1,5 +1,5 @@
 import type { ColumnDef } from "@tanstack/react-table";
-import { AcademicActionGroup } from "@/components/pages/manage-academics/academic-action-group";
+import type { ComponentType } from "react";
 import { BadgeCell } from "@/components/table/data/badge-cell";
 import { DataCell } from "@/components/table/data/cell";
 import { HeaderCell } from "@/components/table/header/cell";
@@ -7,7 +7,14 @@ import { SortCell } from "@/components/table/header/sort-cell";
 import type { AcademicRecord } from "@/lib/api/academics-query";
 import { cn } from "@/lib/utils";
 
-export const getAcademicTableColumns = (): ColumnDef<AcademicRecord>[] => [
+type ActionGroupProps = {
+	record: AcademicRecord;
+	variant: "card" | "cell";
+};
+
+export const getAcademicTableColumns = (
+	ActionGroup: ComponentType<ActionGroupProps>,
+): ColumnDef<AcademicRecord>[] => [
 	{
 		id: "semester",
 		accessorKey: "semester",
@@ -88,9 +95,7 @@ export const getAcademicTableColumns = (): ColumnDef<AcademicRecord>[] => [
 				<span>Actions</span>
 			</HeaderCell>
 		),
-		cell: ({ row }) => (
-			<AcademicActionGroup record={row.original} variant="cell" />
-		),
+		cell: ({ row }) => <ActionGroup record={row.original} variant="cell" />,
 		enableSorting: false,
 		enableColumnFilter: false,
 		meta: {

@@ -1,19 +1,16 @@
 import { createServerFn } from "@tanstack/react-start";
 import { getCookie, getRequestUrl } from "@tanstack/react-start/server";
 import ky from "ky";
+import type { z } from "zod";
+import {
+	type certificateTargetsSchema,
+	type levelTargetsSchema,
+	saveKpiAimPayloadSchema,
+} from "./schemas";
 
-export type LevelTargets = {
-	faculty: number;
-	university: number;
-	local: number;
-	national: number;
-	international: number;
-};
-
-export type CertificateTargets = {
-	professional: number;
-	technical: number;
-};
+export type LevelTargets = z.infer<typeof levelTargetsSchema>;
+export type CertificateTargets = z.infer<typeof certificateTargetsSchema>;
+export type SaveKpiAimPayload = z.infer<typeof saveKpiAimPayloadSchema>;
 
 export type KpiAimNode = {
 	sourceType: "personal" | "lecturer" | "faculty";
@@ -36,13 +33,6 @@ export type KpiAimResponse = {
 		competitions: LevelTargets;
 		certificates: CertificateTargets;
 	};
-};
-
-export type SaveKpiAimPayload = {
-	cgpa: string;
-	activities: LevelTargets;
-	competitions: LevelTargets;
-	certificates: CertificateTargets;
 };
 
 function getApiBaseUrl() {
@@ -97,7 +87,9 @@ export const getKpiAimFn = createServerFn({ method: "GET" }).handler(
 );
 
 export const updateKpiAimFn = createServerFn({ method: "POST" })
-	.inputValidator((payload: SaveKpiAimPayload) => payload)
+	.inputValidator((payload: SaveKpiAimPayload) =>
+		saveKpiAimPayloadSchema.parse(payload),
+	)
 	.handler(async ({ data: payload }) => {
 		const authToken = getCookie("AUTH_TOKEN");
 

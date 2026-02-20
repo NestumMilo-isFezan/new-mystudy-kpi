@@ -6,7 +6,7 @@ import { StudentTableSkeleton } from "@/components/pages/manage-student/student-
 import { allIntakeBatchesQueryOptions } from "@/lib/api/intake-batches-query";
 import { allStudentsQueryOptions } from "@/lib/api/students-query";
 
-export const Route = createFileRoute("/_auth/_staff/staff/manage-students")({
+export const Route = createFileRoute("/_auth/_staff/staff/students/")({
 	loader: async ({ context }) => {
 		await Promise.all([
 			context.queryClient.ensureQueryData(allStudentsQueryOptions),

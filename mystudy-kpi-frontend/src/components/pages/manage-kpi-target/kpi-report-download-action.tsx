@@ -1,10 +1,18 @@
 import { Download } from "lucide-react";
 import { useRef } from "react";
 import { useReactToPrint } from "react-to-print";
-import { Button } from "@/components/ui/button";
+import { Button, type ButtonProps } from "@/components/ui/button";
 import { KpiTargetReport } from "./kpi-target-report";
 
-export function KpiReportDownloadAction() {
+type KpiReportDownloadActionProps = {
+	queryOptions?: unknown;
+	size?: ButtonProps["size"];
+};
+
+export function KpiReportDownloadAction({
+	queryOptions,
+	size = "default",
+}: KpiReportDownloadActionProps) {
 	const contentRef = useRef<HTMLDivElement>(null);
 	const handlePrint = useReactToPrint({
 		contentRef,
@@ -17,6 +25,7 @@ export function KpiReportDownloadAction() {
 				type="button"
 				variant="outline"
 				onClick={() => handlePrint()}
+				size={size}
 				className="w-full md:w-auto"
 			>
 				<Download className="mr-2 size-4" />
@@ -40,7 +49,7 @@ export function KpiReportDownloadAction() {
 								<span>Source: MyStudy KPI System</span>
 							</div>
 						</div>
-						<KpiTargetReport />
+						<KpiTargetReport queryOptions={queryOptions} />
 					</div>
 				</div>
 			</div>

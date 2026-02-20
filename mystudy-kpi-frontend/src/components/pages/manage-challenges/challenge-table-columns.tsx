@@ -1,11 +1,18 @@
 import type { ColumnDef } from "@tanstack/react-table";
-import { ChallengeActionGroup } from "@/components/pages/manage-challenges/challenge-action-group";
+import type { ComponentType } from "react";
 import { DataCell } from "@/components/table/data/cell";
 import { HeaderCell } from "@/components/table/header/cell";
 import { SortCell } from "@/components/table/header/sort-cell";
 import type { Challenge } from "@/lib/api/challenges.functions";
 
-export const getChallengeTableColumns = (): ColumnDef<Challenge>[] => [
+type ActionGroupProps = {
+	record: Challenge;
+	variant: "card" | "cell";
+};
+
+export const getChallengeTableColumns = (
+	ActionGroup: ComponentType<ActionGroupProps>,
+): ColumnDef<Challenge>[] => [
 	{
 		id: "index",
 		header: "No.",
@@ -60,9 +67,7 @@ export const getChallengeTableColumns = (): ColumnDef<Challenge>[] => [
 				<span>Actions</span>
 			</HeaderCell>
 		),
-		cell: ({ row }) => (
-			<ChallengeActionGroup challenge={row.original} variant="cell" />
-		),
+		cell: ({ row }) => <ActionGroup record={row.original} variant="cell" />,
 		enableSorting: false,
 		meta: {
 			sticky: "right",

@@ -2,6 +2,7 @@ import type { TableControlConfig } from "@/components/table/core/table-config";
 
 export function getKpiRecordsTableConfig(
 	filterType?: string,
+	isLecturerMentee?: boolean,
 ): TableControlConfig {
 	return {
 		query: {
@@ -9,7 +10,20 @@ export function getKpiRecordsTableConfig(
 			desktopColumns: ["title"],
 			mobileColumns: ["title"],
 		},
-		filters: [],
+		filters: isLecturerMentee
+			? [
+					{
+						columnId: "type",
+						label: "Type",
+						placeholder: "Filter type",
+						options: [
+							{ label: "Activities", value: "activity" },
+							{ label: "Competitions", value: "competition" },
+							{ label: "Certifications", value: "certification" },
+						],
+					},
+				]
+			: [],
 		sortOptions: [
 			{ columnId: "semester", label: "Semester" },
 			{ columnId: "type", label: "Type" },

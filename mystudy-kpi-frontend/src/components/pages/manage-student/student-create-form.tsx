@@ -12,7 +12,7 @@ import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
 import { allIntakeBatchesQueryOptions } from "@/lib/api/intake-batches-query";
 
-export function StudentCreateForm({ close }: ModalContentProps<unknown>) {
+export function StudentCreateForm({ close }: ModalContentProps<undefined>) {
 	const { createMutation } = useStudentMutations();
 	const { data: batches } = useSuspenseQuery(allIntakeBatchesQueryOptions);
 

@@ -3,9 +3,10 @@ import type { Student } from "@/lib/api/students.functions";
 
 type MenteeCardProps = {
 	student: Student;
+	rootPath: string;
 };
 
-export function MenteeCard({ student }: MenteeCardProps) {
+export function MenteeCard({ student, rootPath }: MenteeCardProps) {
 	return (
 		<div className="flex flex-col gap-3 rounded-xl border border-border bg-card p-4 shadow-sm">
 			<div className="flex items-start justify-between gap-4">
@@ -15,7 +16,11 @@ export function MenteeCard({ student }: MenteeCardProps) {
 						{student.identifier}
 					</p>
 				</div>
-				<MenteeActionGroup student={student} variant="card" />
+				<MenteeActionGroup
+					student={student}
+					variant="card"
+					rootPath={rootPath}
+				/>
 			</div>
 			<div className="text-sm text-muted-foreground truncate">
 				{student.email}

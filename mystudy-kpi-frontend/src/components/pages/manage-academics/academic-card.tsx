@@ -1,4 +1,4 @@
-import { AcademicActionGroup } from "@/components/pages/manage-academics/academic-action-group";
+import type { ComponentType } from "react";
 import { BadgeCell } from "@/components/table/data/badge-cell";
 import {
 	Card,
@@ -10,18 +10,24 @@ import {
 } from "@/components/ui/card";
 import type { AcademicRecord } from "@/lib/api/academics-query";
 
-type AcademicCardProps = {
+type ActionGroupProps = {
 	record: AcademicRecord;
+	variant: "card" | "cell";
 };
 
-export function AcademicCard({ record }: AcademicCardProps) {
+type AcademicCardProps = {
+	record: AcademicRecord;
+	ActionGroup: ComponentType<ActionGroupProps>;
+};
+
+export function AcademicCard({ record, ActionGroup }: AcademicCardProps) {
 	return (
 		<Card size="sm" className="gap-3">
 			<CardHeader className="pb-0">
 				<CardTitle>{record.termString}</CardTitle>
 				<CardDescription>{record.academicYearString}</CardDescription>
 				<CardAction>
-					<AcademicActionGroup record={record} variant="card" />
+					<ActionGroup record={record} variant="card" />
 				</CardAction>
 			</CardHeader>
 			<CardContent className="pt-0 flex justify-between items-center">

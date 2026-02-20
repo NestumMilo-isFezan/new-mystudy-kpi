@@ -8,7 +8,9 @@ import { Field, FieldContent, FieldLabel } from "@/components/ui/field";
 import { NumberInput } from "@/components/ui/number-input";
 
 export function IntakeCreateForm({ close }: ModalContentProps<unknown>) {
-	const [startYear, setStartYear] = useState<number>(new Date().getFullYear());
+	const [startYear, setStartYear] = useState<number>(() =>
+		new Date().getFullYear(),
+	);
 	const { createMutation } = useIntakeMutations();
 
 	const handleSubmit = (e: React.FormEvent) => {

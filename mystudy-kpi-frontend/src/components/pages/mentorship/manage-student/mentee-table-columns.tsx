@@ -5,7 +5,9 @@ import { HeaderCell } from "@/components/table/header/cell";
 import { SortCell } from "@/components/table/header/sort-cell";
 import type { Student } from "@/lib/api/students.functions";
 
-export const getMenteeTableColumns = (): ColumnDef<Student>[] => [
+export const getMenteeTableColumns = (
+	rootPath = "/mentorship",
+): ColumnDef<Student>[] => [
 	{
 		id: "identifier",
 		accessorKey: "identifier",
@@ -48,7 +50,11 @@ export const getMenteeTableColumns = (): ColumnDef<Student>[] => [
 			</HeaderCell>
 		),
 		cell: ({ row }) => (
-			<MenteeActionGroup student={row.original} variant="cell" />
+			<MenteeActionGroup
+				student={row.original}
+				variant="cell"
+				rootPath={rootPath}
+			/>
 		),
 		enableSorting: false,
 		enableColumnFilter: false,

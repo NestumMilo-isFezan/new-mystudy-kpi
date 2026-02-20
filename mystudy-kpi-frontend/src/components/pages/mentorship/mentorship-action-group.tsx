@@ -1,4 +1,4 @@
-import { useNavigate } from "@tanstack/react-router";
+import { type LinkProps, useNavigate } from "@tanstack/react-router";
 import { CircleArrowOutUpRight, Trash2 } from "lucide-react";
 import { useCallback } from "react";
 import { ConfirmationModalContent } from "@/components/modal/confirmation-modal";
@@ -11,11 +11,13 @@ import type { Mentorship } from "@/lib/api/mentorships.functions";
 type MentorshipActionGroupProps = {
 	mentorship: Mentorship;
 	variant: "card" | "cell";
+	rootPath?: LinkProps["to"];
 };
 
 export function MentorshipActionGroup({
 	mentorship,
 	variant,
+	rootPath = "/mentorship",
 }: MentorshipActionGroupProps) {
 	const modal = useModal();
 	const navigate = useNavigate();
@@ -25,11 +27,10 @@ export function MentorshipActionGroup({
 		(e: React.MouseEvent) => {
 			e.stopPropagation();
 			navigate({
-				to: "/mentorship/$mentorshipId",
-				params: { mentorshipId: String(mentorship.id) },
+				to: `${rootPath as string}/${String(mentorship.id)}` as LinkProps["to"],
 			});
 		},
-		[navigate, mentorship.id],
+		[navigate, mentorship.id, rootPath],
 	);
 
 	const handleDelete = useCallback(

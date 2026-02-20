@@ -1,3 +1,4 @@
+import { Link } from "@tanstack/react-router";
 import { MoreHorizontalIcon } from "lucide-react";
 import { useCallback } from "react";
 import { ConfirmationModalContent } from "@/components/modal/confirmation-modal";
@@ -64,6 +65,17 @@ export function IntakeActionMenu({ intake, variant }: IntakeActionMenuProps) {
 				<span className="sr-only">Open intake actions</span>
 			</DropdownMenuTrigger>
 			<DropdownMenuContent align="end" className="w-44">
+				<DropdownMenuItem
+					render={
+						<Link
+							to="/staff/intake/assign-kpi"
+							search={{ batchId: intake.id }}
+						/>
+					}
+				>
+					Manage Targets
+				</DropdownMenuItem>
+				<DropdownMenuSeparator />
 				<DropdownMenuItem onClick={handleEdit}>Edit</DropdownMenuItem>
 				<DropdownMenuItem onClick={handleToggleActive}>
 					{intake.isActive ? "Deactivate" : "Activate"}

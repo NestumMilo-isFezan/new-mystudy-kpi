@@ -1,10 +1,15 @@
 import type { ColumnDef } from "@tanstack/react-table";
-import { KpiRecordActionGroup } from "@/components/pages/manage-kpi-records/kpi-record-action-group";
+import type { ComponentType } from "react";
 import { BadgeCell } from "@/components/table/data/badge-cell";
 import { DataCell } from "@/components/table/data/cell";
 import { HeaderCell } from "@/components/table/header/cell";
 import { SortCell } from "@/components/table/header/sort-cell";
 import type { KpiRecord } from "@/lib/api/kpi-records-query";
+
+type ActionGroupProps = {
+	record: KpiRecord;
+	variant: "card" | "cell";
+};
 
 export const levelMap: Record<number, string> = {
 	0: "Faculty",
@@ -25,7 +30,9 @@ const typeMap: Record<string, string> = {
 	certification: "Certification",
 };
 
-export const getKpiRecordTableColumns = (): ColumnDef<KpiRecord>[] => [
+export const getKpiRecordTableColumns = (
+	ActionGroup: ComponentType<ActionGroupProps>,
+): ColumnDef<KpiRecord>[] => [
 	{
 		id: "index",
 		header: "No.",
@@ -103,9 +110,7 @@ export const getKpiRecordTableColumns = (): ColumnDef<KpiRecord>[] => [
 				<span>Actions</span>
 			</HeaderCell>
 		),
-		cell: ({ row }) => (
-			<KpiRecordActionGroup record={row.original} variant="cell" />
-		),
+		cell: ({ row }) => <ActionGroup record={row.original} variant="cell" />,
 		enableSorting: false,
 		meta: {
 			sticky: "right",

@@ -25,6 +25,13 @@ function normalizePathname(pathname: string) {
 	return pathname;
 }
 
+function isPathActive(current: string, target: string) {
+	const normCurrent = normalizePathname(current);
+	const normTarget = normalizePathname(target);
+
+	return normCurrent === normTarget || normCurrent.startsWith(`${normTarget}/`);
+}
+
 export type NavMainItem = {
 	title: string;
 	url: string;
@@ -40,7 +47,6 @@ export function NavMain({ items }: { items: NavMainItem[] }) {
 	const pathname = useRouterState({
 		select: (state) => state.location.pathname,
 	});
-	const normalizedPathname = normalizePathname(pathname);
 
 	return (
 		<SidebarGroup>
@@ -49,17 +55,14 @@ export function NavMain({ items }: { items: NavMainItem[] }) {
 				{items.map((item) => {
 					const hasChildren = Boolean(item.items?.length);
 					const isItemActive =
-						normalizedPathname === normalizePathname(item.url) ||
-						item.items?.some(
-							(subItem) =>
-								normalizedPathname === normalizePathname(subItem.url),
-						);
+						isPathActive(pathname, item.url) ||
+						item.items?.some((subItem) => isPathActive(pathname, subItem.url));
 
 					if (!hasChildren) {
 						return (
 							<SidebarMenuItem key={item.title}>
 								<SidebarMenuButton
-									isActive={normalizedPathname === normalizePathname(item.url)}
+									isActive={isPathActive(pathname, item.url)}
 									render={
 										<Link to={item.url}>
 											{item.icon ? (
@@ -96,10 +99,7 @@ export function NavMain({ items }: { items: NavMainItem[] }) {
 										{item.items?.map((subItem) => (
 											<SidebarMenuSubItem key={subItem.title}>
 												<SidebarMenuSubButton
-													isActive={
-														normalizedPathname ===
-														normalizePathname(subItem.url)
-													}
+													isActive={isPathActive(pathname, subItem.url)}
 													render={
 														<Link to={subItem.url}>
 															<span>{subItem.title}</span>

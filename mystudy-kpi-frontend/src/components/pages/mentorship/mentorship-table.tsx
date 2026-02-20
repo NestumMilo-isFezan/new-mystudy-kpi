@@ -1,4 +1,9 @@
-import { useSuspenseQuery } from "@tanstack/react-query";
+import {
+	type UseSuspenseQueryOptions,
+	useQuery,
+	useSuspenseQuery,
+} from "@tanstack/react-query";
+import type { LinkProps } from "@tanstack/react-router";
 import { LayoutPanelLeft, Users } from "lucide-react";
 import { useMemo } from "react";
 import { SummaryCard } from "@/components/dashboard/summary-card";
@@ -13,22 +18,42 @@ import {
 } from "@/components/table/core/table-control";
 import { TableToolbar } from "@/components/table/core/table-toolbar";
 import { Badge } from "@/components/ui/badge";
+import { allLecturersQueryOptions } from "@/lib/api/lecturers-query";
 import type { Mentorship } from "@/lib/api/mentorships.functions";
 import { lecturerMentorshipsQueryOptions } from "@/lib/api/mentorships-query";
 
-export function MentorshipTable() {
+type MentorshipTableProps = {
+	queryOptions?: unknown;
+	showLecturer?: boolean;
+	rootPath?: LinkProps["to"];
+};
+
+export function MentorshipTable({
+	queryOptions = lecturerMentorshipsQueryOptions,
+	showLecturer = false,
+	rootPath = "/mentorship",
+}: MentorshipTableProps) {
 	const { data: mentorships } = useSuspenseQuery(
-		lecturerMentorshipsQueryOptions,
+		queryOptions as UseSuspenseQueryOptions<Mentorship[]>,
 	);
+	const { data: allLecturers = [] } = useQuery({
+		...allLecturersQueryOptions,
+		enabled: showLecturer,
+	});
+
 	const totalMentees = mentorships.reduce(
 		(sum, item) => sum + item.menteeCount,
 		0,
 	);
 
-	const columns = useMemo(() => getMentorshipTableColumns(), []);
+	const columns = useMemo(
+		() => getMentorshipTableColumns(showLecturer, rootPath),
+		[showLecturer, rootPath],
+	);
 	const config = useMemo(
-		() => getMentorshipTableControlConfig(mentorships),
-		[mentorships],
+		() =>
+			getMentorshipTableControlConfig(mentorships, showLecturer, allLecturers),
+		[mentorships, showLecturer, allLecturers],
 	);
 
 	if (mentorships.length === 0) {
@@ -66,18 +91,18 @@ export function MentorshipTable() {
 				<div className="hidden md:block">
 					<CoreExpandableTable<Mentorship>
 						renderSubComponent={({ row }) => (
-							<MenteeSubTable mentorship={row.original} />
+							<MenteeSubTable mentorship={row.original} rootPath={rootPath} />
 						)}
 					/>
 				</div>
 
-				<MentorshipMobileList />
+				<MentorshipMobileList rootPath={rootPath} />
 			</div>
 		</TableControl>
 	);
 }
 
-function MentorshipMobileList() {
+function MentorshipMobileList({ rootPath }: { rootPath: LinkProps["to"] }) {
 	const { table } = useTableContext<Mentorship>();
 	const currentRows = table.getRowModel().rows;
 	const totalMentees = currentRows.reduce(
@@ -88,7 +113,11 @@ function MentorshipMobileList() {
 	return (
 		<div className="space-y-3 md:hidden">
 			{currentRows.map((row) => (
-				<MentorshipCard key={row.id} mentorship={row.original} />
+				<MentorshipCard
+					key={row.id}
+					mentorship={row.original}
+					rootPath={rootPath}
+				/>
 			))}
 			{currentRows.length > 0 && (
 				<div className="flex items-center justify-between rounded-xl border border-border bg-muted/30 p-4">

@@ -73,7 +73,7 @@ function AuthNav() {
 						<span>Dashboard</span>
 					</Link>
 					<Link
-						to="/profile"
+						to="/settings/profile"
 						className={baseNavClass}
 						activeProps={{ className: cn(baseNavClass, activeNavClass) }}
 					>

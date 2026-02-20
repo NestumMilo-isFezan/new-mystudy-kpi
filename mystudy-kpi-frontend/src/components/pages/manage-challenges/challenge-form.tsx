@@ -63,9 +63,10 @@ export function ChallengeForm({
 						<FieldContent>
 							<Select
 								value={field.state.value.toString()}
-								onValueChange={(val) =>
-									field.handleChange(Number.parseInt(val, 10))
-								}
+								onValueChange={(val) => {
+									if (!val) return;
+									field.handleChange(Number.parseInt(val, 10));
+								}}
 							>
 								<SelectTrigger className="w-full">
 									<SelectValue placeholder="Select term" />

@@ -1,4 +1,4 @@
-import { StudentActionMenu } from "@/components/pages/manage-student/student-action-menu";
+import { StudentActionGroup } from "@/components/pages/manage-student/student-action-group";
 import {
 	Card,
 	CardAction,
@@ -20,7 +20,7 @@ export function StudentCard({ student }: StudentCardProps) {
 				<CardTitle>{`${student.firstName} ${student.lastName}`}</CardTitle>
 				<CardDescription>{student.identifier}</CardDescription>
 				<CardAction>
-					<StudentActionMenu student={student} variant="card" />
+					<StudentActionGroup student={student} variant="card" />
 				</CardAction>
 			</CardHeader>
 			<CardContent className="pt-0 text-sm text-muted-foreground">

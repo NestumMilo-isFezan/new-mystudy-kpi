@@ -1,4 +1,7 @@
-import { useSuspenseQuery } from "@tanstack/react-query";
+import {
+	type UseSuspenseQueryOptions,
+	useSuspenseQuery,
+} from "@tanstack/react-query";
 import {
 	Table,
 	TableBody,
@@ -31,8 +34,16 @@ type ComparisonRow =
 			actual: string;
 	  };
 
-export function KpiTargetReport() {
-	const { data } = useSuspenseQuery(kpiAimQueryOptions);
+type KpiTargetReportProps = {
+	queryOptions?: unknown;
+};
+
+export function KpiTargetReport({
+	queryOptions: customQueryOptions = kpiAimQueryOptions,
+}: KpiTargetReportProps) {
+	const { data } = useSuspenseQuery(
+		customQueryOptions as UseSuspenseQueryOptions<KpiAimResponse>,
+	);
 
 	const rows = buildComparisonRows(data);
 	const evaluation = buildEvaluation(data);

@@ -3,7 +3,9 @@ import { toast } from "sonner";
 import type { ApiError } from "@/lib/api/http-client";
 import {
 	assignMenteesFn as assignMentees,
+	assignMenteesAdminFn as assignMenteesAdmin,
 	deleteMenteeFn as deleteMentee,
+	deleteMenteeAdminFn as deleteMenteeAdmin,
 	deleteMentorshipFn as deleteMentorship,
 	quickCreateStudentFn as quickCreateStudent,
 } from "@/lib/api/mentorships.functions";
@@ -17,6 +19,27 @@ export function useMentorshipMutations() {
 			assignMentees({ data }),
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ["lecturer-mentorships"] });
+			queryClient.invalidateQueries({ queryKey: ["admin-mentorships"] });
+			queryClient.invalidateQueries({ queryKey: ["mentorship"] });
+			queryClient.invalidateQueries({ queryKey: ["available-students"] });
+			toast.success("Mentees assigned successfully");
+		},
+		onError: (error: ApiError) => {
+			toast.error(error.message || "Failed to assign mentees");
+		},
+	});
+
+	const assignAdminMutation = useMutation({
+		mutationFn: (data: {
+			batchId: number;
+			studentIds: string[];
+			lecturerId: string;
+		}) => assignMenteesAdmin({ data }),
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: ["lecturer-mentorships"] });
+			queryClient.invalidateQueries({ queryKey: ["admin-mentorships"] });
+			queryClient.invalidateQueries({ queryKey: ["mentorship"] });
+			queryClient.invalidateQueries({ queryKey: ["admin-mentorship"] });
 			queryClient.invalidateQueries({ queryKey: ["available-students"] });
 			toast.success("Mentees assigned successfully");
 		},
@@ -29,6 +52,20 @@ export function useMentorshipMutations() {
 		mutationFn: (id: string) => deleteMentee({ data: id }),
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ["lecturer-mentorships"] });
+			queryClient.invalidateQueries({ queryKey: ["admin-mentorships"] });
+			queryClient.invalidateQueries({ queryKey: ["available-students"] });
+			toast.success("Mentee removed from mentorship");
+		},
+		onError: (error: ApiError) => {
+			toast.error(error.message || "Failed to remove mentee");
+		},
+	});
+
+	const removeMenteeAdminMutation = useMutation({
+		mutationFn: (id: string) => deleteMenteeAdmin({ data: id }),
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: ["lecturer-mentorships"] });
+			queryClient.invalidateQueries({ queryKey: ["admin-mentorships"] });
 			queryClient.invalidateQueries({ queryKey: ["available-students"] });
 			toast.success("Mentee removed from mentorship");
 		},
@@ -41,6 +78,9 @@ export function useMentorshipMutations() {
 		mutationFn: (id: number) => deleteMentorship({ data: id }),
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ["lecturer-mentorships"] });
+			queryClient.invalidateQueries({ queryKey: ["admin-mentorships"] });
+			queryClient.invalidateQueries({ queryKey: ["mentorship"] });
+			queryClient.invalidateQueries({ queryKey: ["admin-mentorship"] });
 			toast.success("Mentorship record deleted");
 		},
 		onError: (error: ApiError) => {
@@ -63,7 +103,9 @@ export function useMentorshipMutations() {
 
 	return {
 		assignMutation,
+		assignAdminMutation,
 		removeMenteeMutation,
+		removeMenteeAdminMutation,
 		deleteMentorshipMutation,
 		quickCreateStudentMutation,
 	};

@@ -1,30 +1,33 @@
-import { MoreHorizontalIcon } from "lucide-react";
+import { useNavigate } from "@tanstack/react-router";
+import { Eye, Pencil, Trash2 } from "lucide-react";
 import { useCallback } from "react";
 import { ConfirmationModalContent } from "@/components/modal/confirmation-modal";
 import { StudentEditForm } from "@/components/pages/manage-student/student-edit-form";
 import { useStudentMutations } from "@/components/pages/manage-student/use-student-mutations";
 import { Button } from "@/components/ui/button";
-import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuItem,
-	DropdownMenuSeparator,
-	DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { ButtonGroup } from "@/components/ui/button-group";
 import { useModal } from "@/hooks/use-modal";
 import type { Student } from "@/lib/api/students.functions";
 
-type StudentActionMenuProps = {
+type StudentActionGroupProps = {
 	student: Student;
 	variant: "card" | "cell";
 };
 
-export function StudentActionMenu({
+export function StudentActionGroup({
 	student,
 	variant,
-}: StudentActionMenuProps) {
+}: StudentActionGroupProps) {
 	const modal = useModal();
+	const navigate = useNavigate();
 	const { deleteMutation } = useStudentMutations();
+
+	const handleView = useCallback(() => {
+		navigate({
+			to: "/staff/students/$id",
+			params: { id: student.id },
+		});
+	}, [navigate, student.id]);
 
 	const handleEdit = useCallback(() => {
 		modal.open({
@@ -51,25 +54,32 @@ export function StudentActionMenu({
 	}, [modal, deleteMutation, student]);
 
 	return (
-		<DropdownMenu>
-			<DropdownMenuTrigger
-				render={
-					<Button
-						variant="ghost"
-						size={variant === "card" ? "sm" : "icon-sm"}
-					/>
-				}
+		<ButtonGroup className={variant === "card" ? "w-full justify-end" : ""}>
+			<Button
+				variant="outline"
+				size="icon-sm"
+				onClick={handleView}
+				title="View Student Progress"
 			>
-				<MoreHorizontalIcon />
-				<span className="sr-only">Open student actions</span>
-			</DropdownMenuTrigger>
-			<DropdownMenuContent align="end" className="w-44">
-				<DropdownMenuItem onClick={handleEdit}>Edit</DropdownMenuItem>
-				<DropdownMenuSeparator />
-				<DropdownMenuItem variant="destructive" onClick={handleDelete}>
-					Delete
-				</DropdownMenuItem>
-			</DropdownMenuContent>
-		</DropdownMenu>
+				<Eye className="size-4" />
+			</Button>
+			<Button
+				variant="outline"
+				size="icon-sm"
+				onClick={handleEdit}
+				title="Edit Student"
+			>
+				<Pencil className="size-4" />
+			</Button>
+			<Button
+				variant="outline"
+				size="icon-sm"
+				onClick={handleDelete}
+				className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+				title="Delete Student"
+			>
+				<Trash2 className="size-4" />
+			</Button>
+		</ButtonGroup>
 	);
 }

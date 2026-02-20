@@ -22,17 +22,22 @@ export function IntakeBatchSelector({
 	onChange,
 	source = "all",
 }: IntakeBatchSelectorProps) {
-	const { data: batches } = useSuspenseQuery(
+	const queryOptions =
 		source === "active"
 			? intakeBatchesQueryOptions
-			: allIntakeBatchesQueryOptions,
+			: allIntakeBatchesQueryOptions;
+	const { data: batches } = useSuspenseQuery(
+		queryOptions as typeof intakeBatchesQueryOptions,
 	);
 
 	const stringValue = value ? value.toString() : "";
 	const selectedBatch = batches.find((b) => b.id.toString() === stringValue);
 
 	return (
-		<Select value={stringValue} onValueChange={(val) => onChange(Number(val))}>
+		<Select
+			value={stringValue}
+			onValueChange={(val) => onChange(Number(val ?? 0))}
+		>
 			<SelectTrigger className="w-full">
 				<SelectValue placeholder="Select Intake Batch">
 					{selectedBatch

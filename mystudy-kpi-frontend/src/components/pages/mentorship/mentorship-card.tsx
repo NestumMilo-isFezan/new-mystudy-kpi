@@ -11,12 +11,20 @@ import type { Student } from "@/lib/api/students.functions";
 
 type MentorshipCardProps = {
 	mentorship: Mentorship;
+	rootPath?: string;
 };
 
-export function MentorshipCard({ mentorship }: MentorshipCardProps) {
+export function MentorshipCard({
+	mentorship,
+	rootPath = "/mentorship",
+}: MentorshipCardProps) {
 	const [isExpanded, setIsExpanded] = useState(false);
 	const modal = useModal();
-	const { removeMenteeMutation } = useMentorshipMutations();
+	const { removeMenteeMutation, removeMenteeAdminMutation } =
+		useMentorshipMutations();
+	const activeMutation = String(rootPath).startsWith("/staff")
+		? removeMenteeAdminMutation
+		: removeMenteeMutation;
 
 	const handleRemoveMentee = useCallback(
 		(student: Student) => {
@@ -26,13 +34,14 @@ export function MentorshipCard({ mentorship }: MentorshipCardProps) {
 				size: "sm",
 				Content: ConfirmationModalContent,
 				payload: {
-					onConfirm: () => removeMenteeMutation.mutate(student.id),
+					onConfirm: () => activeMutation.mutate(student.id),
 					confirmLabel: "Remove",
 					variant: "destructive",
+					isPending: activeMutation.isPending,
 				},
 			});
 		},
-		[modal, removeMenteeMutation],
+		[activeMutation, modal],
 	);
 
 	return (
