@@ -1,6 +1,6 @@
 export type AppRole = "student" | "lecturer" | "staff";
 
-export function mapRole(roleValue: number): AppRole {
+export function mapRole(roleValue: number): AppRole | null {
 	if (roleValue === 2) {
 		return "staff";
 	}
@@ -9,5 +9,9 @@ export function mapRole(roleValue: number): AppRole {
 		return "lecturer";
 	}
 
-	return "student";
+	if (roleValue === 0) {
+		return "student";
+	}
+
+	return null;
 }

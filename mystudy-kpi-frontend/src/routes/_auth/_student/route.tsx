@@ -3,7 +3,7 @@ import { requireRole } from "@/lib/auth/route-guards";
 
 export const Route = createFileRoute("/_auth/_student")({
 	beforeLoad: async ({ context }) => {
-		await requireRole(context.queryClient, ["student", "lecturer", "staff"]);
+		await requireRole(context.queryClient, "student");
 	},
 	component: () => <Outlet />,
 });

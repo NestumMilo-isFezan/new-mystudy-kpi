@@ -21,6 +21,7 @@ function DashboardPage() {
 		]
 			.filter(Boolean)
 			.join(" ") || session.user.identifier;
+	const roleLabel = mapRole(session.user.role) ?? "unknown";
 
 	return (
 		<div className="py-6 text-foreground">
@@ -31,7 +32,7 @@ function DashboardPage() {
 				<h2 className="mt-2 text-3xl font-semibold">Welcome, {displayName}</h2>
 				<p className="mt-2 text-muted-foreground">
 					You are logged in as{" "}
-					<span className="font-semibold">{mapRole(session.user.role)}</span>.
+					<span className="font-semibold">{roleLabel}</span>.
 				</p>
 
 				<div className="mt-8 grid gap-4 md:grid-cols-2">

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Security;
 
 use App\Enum\UserRole;
+use App\Exception\InvalidRoleException;
 
 class RoleMapper
 {
@@ -13,7 +14,7 @@ class RoleMapper
         $role = UserRole::tryFrom($roleValue);
 
         if (null === $role) {
-            throw new \InvalidArgumentException('Unknown role value.');
+            throw new InvalidRoleException();
         }
 
         return $role->label();

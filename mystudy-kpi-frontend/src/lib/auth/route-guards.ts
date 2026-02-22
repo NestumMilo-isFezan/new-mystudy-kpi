@@ -40,6 +40,10 @@ export async function requireRole(
 	const userRole = mapRole(session.user.role);
 	const allowedRoles = Array.isArray(roles) ? roles : [roles];
 
+	if (!userRole) {
+		throw redirect({ to: "/login" });
+	}
+
 	if (!allowedRoles.includes(userRole)) {
 		throw redirect({ to: "/dashboard" });
 	}
