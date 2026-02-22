@@ -1,0 +1,391 @@
+parameters:
+	ignoreErrors:
+		-
+			message: '#^Property App\\Controller\\Api\\AdminStudentDetailController\:\:\$kpiAimSerializer is never read, only written\.$#'
+			identifier: property.onlyWritten
+			count: 1
+			path: src/Controller/Api/AdminStudentDetailController.php
+
+		-
+			message: '#^Dead catch \- JsonException is never thrown in the try block\.$#'
+			identifier: catch.neverThrown
+			count: 1
+			path: src/Controller/Api/AuthController.php
+
+		-
+			message: '#^Instanceof between App\\Entity\\User and App\\Entity\\User will always evaluate to true\.$#'
+			identifier: instanceof.alwaysTrue
+			count: 5
+			path: src/Controller/Api/LecturerMentorshipController.php
+
+		-
+			message: '#^Method App\\Controller\\Api\\ProfileController\:\:serializeProfile\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Controller/Api/ProfileController.php
+
+		-
+			message: '#^Property App\\Dto\\KpiRecordDto\:\:\$tags type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Dto/KpiRecordDto.php
+
+		-
+			message: '#^Method App\\Entity\\KpiAim\:\:getActivityTargets\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Entity/KpiAim.php
+
+		-
+			message: '#^Method App\\Entity\\KpiAim\:\:getCertificateTargets\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Entity/KpiAim.php
+
+		-
+			message: '#^Method App\\Entity\\KpiAim\:\:getCompetitionTargets\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Entity/KpiAim.php
+
+		-
+			message: '#^Method App\\Entity\\KpiAim\:\:setActivityTargets\(\) has parameter \$activityTargets with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Entity/KpiAim.php
+
+		-
+			message: '#^Method App\\Entity\\KpiAim\:\:setCertificateTargets\(\) has parameter \$certificateTargets with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Entity/KpiAim.php
+
+		-
+			message: '#^Method App\\Entity\\KpiAim\:\:setCompetitionTargets\(\) has parameter \$competitionTargets with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Entity/KpiAim.php
+
+		-
+			message: '#^Property App\\Entity\\KpiAim\:\:\$activityTargets type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Entity/KpiAim.php
+
+		-
+			message: '#^Property App\\Entity\\KpiAim\:\:\$certificateTargets type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Entity/KpiAim.php
+
+		-
+			message: '#^Property App\\Entity\\KpiAim\:\:\$competitionTargets type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Entity/KpiAim.php
+
+		-
+			message: '#^Method App\\Entity\\KpiRecord\:\:getTags\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Entity/KpiRecord.php
+
+		-
+			message: '#^Method App\\Entity\\KpiRecord\:\:setTags\(\) has parameter \$tags with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Entity/KpiRecord.php
+
+		-
+			message: '#^Property App\\Entity\\KpiRecord\:\:\$tags type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Entity/KpiRecord.php
+
+		-
+			message: '#^Property App\\Entity\\Mentee\:\:\$mentorship type mapping mismatch\: property can contain App\\Entity\\Mentorship\|null but database expects App\\Entity\\Mentorship\.$#'
+			identifier: doctrine.associationType
+			count: 1
+			path: src/Entity/Mentee.php
+
+		-
+			message: '#^Property App\\Entity\\Profile\:\:\$firstName type mapping mismatch\: property can contain string\|null but database expects string\.$#'
+			identifier: doctrine.columnType
+			count: 1
+			path: src/Entity/Profile.php
+
+		-
+			message: '#^Property App\\Entity\\Profile\:\:\$lastName type mapping mismatch\: property can contain string\|null but database expects string\.$#'
+			identifier: doctrine.columnType
+			count: 1
+			path: src/Entity/Profile.php
+
+		-
+			message: '#^Property App\\Entity\\UserSession\:\:\$user type mapping mismatch\: property can contain App\\Entity\\User\|null but database expects App\\Entity\\User\.$#'
+			identifier: doctrine.associationType
+			count: 1
+			path: src/Entity/UserSession.php
+
+		-
+			message: '#^Class App\\Repository\\MenteeRepository has PHPDoc tag @method for method findBy\(\) parameter \#1 \$criteria with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/MenteeRepository.php
+
+		-
+			message: '#^Class App\\Repository\\MenteeRepository has PHPDoc tag @method for method findBy\(\) parameter \#2 \$orderBy with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/MenteeRepository.php
+
+		-
+			message: '#^Class App\\Repository\\MenteeRepository has PHPDoc tag @method for method findOneBy\(\) parameter \#1 \$criteria with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/MenteeRepository.php
+
+		-
+			message: '#^Class App\\Repository\\MenteeRepository has PHPDoc tag @method for method findOneBy\(\) parameter \#2 \$orderBy with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/MenteeRepository.php
+
+		-
+			message: '#^Class App\\Repository\\MentorshipRepository has PHPDoc tag @method for method findBy\(\) parameter \#1 \$criteria with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/MentorshipRepository.php
+
+		-
+			message: '#^Class App\\Repository\\MentorshipRepository has PHPDoc tag @method for method findBy\(\) parameter \#2 \$orderBy with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/MentorshipRepository.php
+
+		-
+			message: '#^Class App\\Repository\\MentorshipRepository has PHPDoc tag @method for method findOneBy\(\) parameter \#1 \$criteria with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/MentorshipRepository.php
+
+		-
+			message: '#^Class App\\Repository\\MentorshipRepository has PHPDoc tag @method for method findOneBy\(\) parameter \#2 \$orderBy with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/MentorshipRepository.php
+
+		-
+			message: '#^Method App\\Repository\\MentorshipRepository\:\:findAllWithCountsAndLimitedMentees\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/MentorshipRepository.php
+
+		-
+			message: '#^Method App\\Repository\\MentorshipRepository\:\:findByLecturerWithCountsAndLimitedMentees\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/MentorshipRepository.php
+
+		-
+			message: '#^Method App\\Serializer\\AcademicResponseSerializer\:\:serialize\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Serializer/AcademicResponseSerializer.php
+
+		-
+			message: '#^Method App\\Serializer\\AcademicResponseSerializer\:\:serializeCollection\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Serializer/AcademicResponseSerializer.php
+
+		-
+			message: '#^Method App\\Serializer\\ChallengeResponseSerializer\:\:serialize\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Serializer/ChallengeResponseSerializer.php
+
+		-
+			message: '#^Method App\\Serializer\\ChallengeResponseSerializer\:\:serializeCollection\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Serializer/ChallengeResponseSerializer.php
+
+		-
+			message: '#^Method App\\Serializer\\KpiAimResponseSerializer\:\:normalizeCertificateTargets\(\) has parameter \$targets with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Serializer/KpiAimResponseSerializer.php
+
+		-
+			message: '#^Method App\\Serializer\\KpiAimResponseSerializer\:\:normalizeCertificateTargets\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Serializer/KpiAimResponseSerializer.php
+
+		-
+			message: '#^Method App\\Serializer\\KpiAimResponseSerializer\:\:normalizeLevelTargets\(\) has parameter \$targets with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Serializer/KpiAimResponseSerializer.php
+
+		-
+			message: '#^Method App\\Serializer\\KpiAimResponseSerializer\:\:normalizeLevelTargets\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Serializer/KpiAimResponseSerializer.php
+
+		-
+			message: '#^Method App\\Serializer\\KpiAimResponseSerializer\:\:serialize\(\) has parameter \$actual with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Serializer/KpiAimResponseSerializer.php
+
+		-
+			message: '#^Method App\\Serializer\\KpiAimResponseSerializer\:\:serialize\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Serializer/KpiAimResponseSerializer.php
+
+		-
+			message: '#^Method App\\Serializer\\KpiAimResponseSerializer\:\:serializeBatch\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Serializer/KpiAimResponseSerializer.php
+
+		-
+			message: '#^Method App\\Serializer\\KpiAimResponseSerializer\:\:serializeLecturer\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Serializer/KpiAimResponseSerializer.php
+
+		-
+			message: '#^Method App\\Serializer\\KpiAimResponseSerializer\:\:serializePersonal\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Serializer/KpiAimResponseSerializer.php
+
+		-
+			message: '#^Method App\\Serializer\\KpiAimResponseSerializer\:\:serializeSingle\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Serializer/KpiAimResponseSerializer.php
+
+		-
+			message: '#^Method App\\Serializer\\KpiRecordResponseSerializer\:\:serialize\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Serializer/KpiRecordResponseSerializer.php
+
+		-
+			message: '#^Method App\\Serializer\\KpiRecordResponseSerializer\:\:serializeCollection\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Serializer/KpiRecordResponseSerializer.php
+
+		-
+			message: '#^Method App\\Serializer\\MentorshipResponseSerializer\:\:getMentees\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Serializer/MentorshipResponseSerializer.php
+
+		-
+			message: '#^Method App\\Serializer\\MentorshipResponseSerializer\:\:mapMenteeEntitiesToDtos\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Serializer/MentorshipResponseSerializer.php
+
+		-
+			message: '#^Method App\\Serializer\\MentorshipResponseSerializer\:\:serialize\(\) has parameter \$mentees with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Serializer/MentorshipResponseSerializer.php
+
+		-
+			message: '#^Method App\\Serializer\\MentorshipResponseSerializer\:\:serialize\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Serializer/MentorshipResponseSerializer.php
+
+		-
+			message: '#^Method App\\Serializer\\MentorshipResponseSerializer\:\:serializeFull\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Serializer/MentorshipResponseSerializer.php
+
+		-
+			message: '#^Parameter \#1 \$user of method App\\Serializer\\UserResponseSerializer\:\:serialize\(\) expects App\\Entity\\User, App\\Serializer\\User given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Serializer/MentorshipResponseSerializer.php
+
+		-
+			message: '#^Parameter \$students of method App\\Serializer\\MentorshipResponseSerializer\:\:mapMenteeEntitiesToDtos\(\) has invalid type App\\Serializer\\User\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Serializer/MentorshipResponseSerializer.php
+
+		-
+			message: '#^Method App\\Serializer\\UserResponseSerializer\:\:serialize\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Serializer/UserResponseSerializer.php
+
+		-
+			message: '#^Method App\\Service\\AcademicService\:\:scaffoldStandardSemesters\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Service/AcademicService.php
+
+		-
+			message: '#^Method App\\Service\\KpiAggregationService\:\:buildActual\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Service/KpiAggregationService.php
+
+		-
+			message: '#^Method App\\Service\\KpiAggregationService\:\:buildSummary\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Service/KpiAggregationService.php
+
+		-
+			message: '#^Method App\\Service\\KpiAimService\:\:getAims\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Service/KpiAimService.php
+
+		-
+			message: '#^Method App\\Service\\KpiAimService\:\:getBatchAim\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Service/KpiAimService.php
+
+		-
+			message: '#^Call to function is_array\(\) with array\{count\: int, expiresAt\: int\} will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: src/Service/LoginRateLimiter.php
+
+		-
+			message: '#^Offset ''count'' on array\{count\: int, expiresAt\: int\} in isset\(\) always exists and is not nullable\.$#'
+			identifier: isset.offset
+			count: 1
+			path: src/Service/LoginRateLimiter.php
+
+		-
+			message: '#^Offset ''expiresAt'' on array\{count\: int, expiresAt\: int\} in isset\(\) always exists and is not nullable\.$#'
+			identifier: isset.offset
+			count: 1
+			path: src/Service/LoginRateLimiter.php
+
+		-
+			message: '#^Method App\\Service\\MentorshipService\:\:findAllForIndex\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Service/MentorshipService.php
+
+		-
+			message: '#^Method App\\Service\\MentorshipService\:\:findByLecturerForIndex\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Service/MentorshipService.php

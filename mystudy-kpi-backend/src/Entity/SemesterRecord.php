@@ -16,7 +16,7 @@ class SemesterRecord
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column(type: 'smallint')]
+    #[ORM\Column(type: 'bigint')]
     private ?int $id = null;
 
     #[ORM\ManyToOne(targetEntity: User::class)]
