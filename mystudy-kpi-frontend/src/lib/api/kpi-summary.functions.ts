@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { getCookie, getRequestUrl } from "@tanstack/react-start/server";
-import ky from "ky";
+import { HTTPError } from "ky";
+import ky from "./ky";
 
 export type KpiCategoryCounts = {
 	faculty: number;
@@ -47,16 +48,24 @@ export const getKpiSummaryFn = createServerFn({ method: "GET" }).handler(
 		const authToken = getCookie("AUTH_TOKEN");
 
 		if (!authToken) {
-			throw new Error("Unauthorized");
+			return null;
 		}
 
-		return await ky
-			.get(`${getApiBaseUrl()}/api/student/kpi-summary`, {
-				headers: {
-					Accept: "application/json",
-					Cookie: `AUTH_TOKEN=${authToken}`,
-				},
-			})
-			.json<KpiSummaryResponse>();
+		try {
+			return await ky
+				.get(`${getApiBaseUrl()}/api/student/kpi-summary`, {
+					headers: {
+						Accept: "application/json",
+						Cookie: `AUTH_TOKEN=${authToken}`,
+					},
+				})
+				.json<KpiSummaryResponse>();
+		} catch (error) {
+			if (error instanceof HTTPError && error.response.status === 401) {
+				return null;
+			}
+
+			throw error;
+		}
 	},
 );

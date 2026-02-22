@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { getCookie, getRequestUrl } from "@tanstack/react-start/server";
-import ky from "ky";
+import ky from "./ky";
 
 export interface UserSession {
 	id: string;

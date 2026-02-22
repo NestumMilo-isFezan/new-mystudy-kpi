@@ -1,6 +1,8 @@
 import { createServerFn } from "@tanstack/react-start";
 import { getCookie, getRequestUrl } from "@tanstack/react-start/server";
-import ky from "ky";
+import { HTTPError } from "ky";
+import { academicListParamsSchema } from "./academic-list-params";
+import ky from "./ky";
 
 export type AcademicRecord = {
 	id: number;
@@ -35,19 +37,60 @@ export const getAcademicsFn = createServerFn({ method: "GET" }).handler(
 		const authToken = getCookie("AUTH_TOKEN");
 
 		if (!authToken) {
-			return [];
+			return null;
 		}
 
-		return await ky
-			.get(`${getApiBaseUrl()}/api/student/academics`, {
-				headers: {
-					Accept: "application/json",
-					Cookie: `AUTH_TOKEN=${authToken}`,
-				},
-			})
-			.json<AcademicRecord[]>();
+		try {
+			return await ky
+				.get(`${getApiBaseUrl()}/api/student/academics`, {
+					headers: {
+						Accept: "application/json",
+						Cookie: `AUTH_TOKEN=${authToken}`,
+					},
+				})
+				.json<AcademicRecord[]>();
+		} catch (error) {
+			if (error instanceof HTTPError && error.response.status === 401) {
+				return null;
+			}
+
+			throw error;
+		}
 	},
 );
+
+export const getAcademicsSortedFn = createServerFn({ method: "GET" })
+	.inputValidator((params: unknown) => academicListParamsSchema.parse(params))
+	.handler(async ({ data: params }) => {
+		const authToken = getCookie("AUTH_TOKEN");
+
+		if (!authToken) {
+			return null;
+		}
+
+		const searchParams: Record<string, string> = {};
+		if (params.sortBy) searchParams.sortBy = params.sortBy;
+		if (params.sortDir) searchParams.sortDir = params.sortDir;
+		if (params.semester) searchParams.semester = String(params.semester);
+
+		try {
+			return await ky
+				.get(`${getApiBaseUrl()}/api/student/academics`, {
+					searchParams,
+					headers: {
+						Accept: "application/json",
+						Cookie: `AUTH_TOKEN=${authToken}`,
+					},
+				})
+				.json<AcademicRecord[]>();
+		} catch (error) {
+			if (error instanceof HTTPError && error.response.status === 401) {
+				return null;
+			}
+
+			throw error;
+		}
+	});
 
 export const saveAcademicFn = createServerFn({ method: "POST" })
 	.inputValidator((data: SaveAcademicPayload) => data)

@@ -1,7 +1,8 @@
 import { createServerFn } from "@tanstack/react-start";
 import { getCookie, getRequestUrl } from "@tanstack/react-start/server";
-import ky from "ky";
+import { HTTPError } from "ky";
 import type { AuthUser } from "./auth.functions";
+import ky from "./ky";
 
 export type UserProfile = {
 	id: string;
@@ -54,7 +55,7 @@ export const getProfileFn = createServerFn({ method: "GET" }).handler(
 				})
 				.json<SessionResponse>();
 		} catch (error) {
-			if (error instanceof Error && error.message.includes("401")) {
+			if (error instanceof HTTPError && error.response.status === 401) {
 				return null;
 			}
 			throw new Error("Unable to load session.");
