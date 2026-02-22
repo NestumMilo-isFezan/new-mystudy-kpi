@@ -9,8 +9,9 @@ use Symfony\Component\Validator\Constraints as Assert;
 final class AccountUpdateDto
 {
     public function __construct(
-        #[Assert\NotBlank]
-        public string $intakeBatchId,
+        #[Assert\NotNull]
+        #[Assert\Positive]
+        public int $intakeBatchId,
     ) {
     }
 }

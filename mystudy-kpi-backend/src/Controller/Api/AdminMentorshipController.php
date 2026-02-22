@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Controller\Api;
 
 use App\Dto\KpiAimUpdateDto;
+use App\Dto\MenteeNotesUpdateDto;
 use App\Dto\MentorshipAssignDto;
 use App\Entity\User;
 use App\Repository\IntakeBatchRepository;
@@ -13,6 +14,7 @@ use App\Serializer\MentorshipResponseSerializer;
 use App\Serializer\UserResponseSerializer;
 use App\Service\KpiAimService;
 use App\Service\MentorshipService;
+use App\Service\PaginationService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -27,6 +29,7 @@ final class AdminMentorshipController extends AbstractController
     public function __construct(
         private readonly MentorshipService $mentorshipService,
         private readonly KpiAimService $kpiAimService,
+        private readonly PaginationService $paginationService,
         private readonly IntakeBatchRepository $intakeBatchRepository,
         private readonly UserResponseSerializer $userSerializer,
         private readonly KpiAimResponseSerializer $kpiAimSerializer,
@@ -48,6 +51,43 @@ final class AdminMentorshipController extends AbstractController
         }
 
         return $this->json($result);
+    }
+
+    #[Route('/page', name: 'api_admin_mentorships_page', methods: ['GET'])]
+    public function listMentorshipsPage(Request $request): JsonResponse
+    {
+        $pagination = $this->paginationService->resolve($request);
+        $sort = $this->paginationService->resolveMentorshipSort($request);
+        $startYearRaw = $this->paginationService->resolveFilter($request, 'startYear');
+        $startYear = $startYearRaw !== null ? (int) $startYearRaw : null;
+        $lecturerId = $this->paginationService->resolveFilter($request, 'lecturerId');
+
+        $page = $this->mentorshipService->findAllPage(
+            $pagination['page'],
+            $pagination['limit'],
+            $sort['sortBy'],
+            $sort['sortDir'],
+            $startYear,
+            $lecturerId,
+        );
+
+        $items = [];
+        foreach ($page['items'] as $row) {
+            $items[] = $this->mentorshipSerializer->serialize(
+                $row['mentorship'],
+                $row['mentees'],
+                $row['menteeCount'],
+            );
+        }
+
+        return $this->json([
+            'items' => $items,
+            'pagination' => $this->paginationService->metadata(
+                $pagination['page'],
+                $pagination['limit'],
+                $page['total'],
+            ),
+        ]);
     }
 
     #[Route('/{id}', name: 'api_admin_mentorships_show', methods: ['GET'], requirements: ['id' => '\d+'])]
@@ -112,13 +152,10 @@ final class AdminMentorshipController extends AbstractController
     }
 
     #[Route('/mentees/{studentId}/notes', name: 'api_admin_mentees_update_notes', methods: ['PATCH'])]
-    public function updateNotes(string $studentId, Request $request): JsonResponse
+    public function updateNotes(string $studentId, #[MapRequestPayload] MenteeNotesUpdateDto $dto): JsonResponse
     {
-        $data = json_decode($request->getContent(), true);
-        $notes = $data['notes'] ?? null;
-
         try {
-            $this->mentorshipService->updateMenteeNotes($studentId, $notes);
+            $this->mentorshipService->updateMenteeNotes($studentId, $dto->notes);
             return $this->json(['message' => 'Notes updated.']);
         } catch (\InvalidArgumentException $e) {
             return $this->json(['message' => $e->getMessage()], JsonResponse::HTTP_NOT_FOUND);

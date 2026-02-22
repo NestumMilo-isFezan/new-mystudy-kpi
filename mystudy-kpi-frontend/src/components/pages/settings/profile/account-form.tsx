@@ -20,9 +20,14 @@ export function AccountForm({ user }: { user: AuthUser }) {
 		defaultValues: {
 			identifier: user.identifier,
 			email: user.email,
-			intakeBatchId: user.intake?.id?.toString() ?? "",
+			intakeBatchId: user.intake?.id ?? 0,
 		},
 		onSubmit: async ({ value }) => {
+			if (isStudent && value.intakeBatchId <= 0) {
+				toast.error("Please select an intake batch");
+				return;
+			}
+
 			modal.open({
 				title: "Update Account",
 				description:
@@ -93,7 +98,7 @@ export function AccountForm({ user }: { user: AuthUser }) {
 							<Label htmlFor={field.name}>Intake Batch</Label>
 							<IntakeBatchSelector
 								value={field.state.value}
-								onChange={(val) => field.handleChange(val.toString())}
+								onChange={(val) => field.handleChange(val)}
 							/>
 						</div>
 					)}

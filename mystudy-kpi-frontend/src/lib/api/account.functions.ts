@@ -1,10 +1,10 @@
 import { createServerFn } from "@tanstack/react-start";
 import { getCookie, getRequestUrl } from "@tanstack/react-start/server";
-import ky from "ky";
 import type { AuthUser } from "./auth.functions";
+import ky from "./ky";
 
 export type AccountUpdatePayload = {
-	intakeBatchId: string;
+	intakeBatchId: number;
 };
 
 export type PasswordUpdatePayload = {

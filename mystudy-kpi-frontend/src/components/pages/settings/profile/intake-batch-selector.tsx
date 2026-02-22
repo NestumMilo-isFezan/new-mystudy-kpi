@@ -9,7 +9,7 @@ import {
 import { intakeBatchesQueryOptions } from "@/lib/api/intake-batches-query";
 
 type IntakeBatchSelectorProps = {
-	value: number | string;
+	value: number;
 	onChange: (value: number) => void;
 };
 

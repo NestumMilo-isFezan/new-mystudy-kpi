@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { getCookie, getRequestUrl } from "@tanstack/react-start/server";
-import ky from "ky";
 import { z } from "zod";
+import ky from "./ky";
 import type { SerializedKpiAim } from "./mentorships.functions";
 import { uuidSchema } from "./schemas";
 import type { Student } from "./students.functions";
