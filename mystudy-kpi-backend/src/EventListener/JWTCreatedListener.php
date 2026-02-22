@@ -6,8 +6,10 @@ namespace App\EventListener;
 
 use App\Entity\User;
 use App\Entity\UserSession;
+use App\Exception\SessionCreationFailedException;
 use Doctrine\ORM\EntityManagerInterface;
 use Lexik\Bundle\JWTAuthenticationBundle\Event\JWTCreatedEvent;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 final readonly class JWTCreatedListener
@@ -15,17 +17,18 @@ final readonly class JWTCreatedListener
     public function __construct(
         private EntityManagerInterface $entityManager,
         private RequestStack $requestStack,
+        private LoggerInterface $logger,
     ) {
     }
 
     public function onJWTCreated(JWTCreatedEvent $event): void
     {
-        try {
-            $user = $event->getUser();
-            if (!$user instanceof User) {
-                return;
-            }
+        $user = $event->getUser();
+        if (!$user instanceof User) {
+            return;
+        }
 
+        try {
             $request = $this->requestStack->getCurrentRequest();
             $payload = $event->getData();
 
@@ -33,7 +36,7 @@ final readonly class JWTCreatedListener
             $session->setUser($user);
             $session->setIpAddress($request?->getClientIp());
             $session->setUserAgent($request?->headers->get('User-Agent'));
-            
+
             // 30 days expiration
             $session->setExpiresAt(new \DateTimeImmutable('+30 days'));
 
@@ -44,9 +47,13 @@ final readonly class JWTCreatedListener
             $payload['jti'] = $session->getId();
 
             $event->setData($payload);
-        } catch (\Exception) {
-            // Silently fail - if session tracking fails, we still want to allow login
-            // but the jti will be missing, so we'll need to handle that gracefully
+        } catch (\Throwable $exception) {
+            $this->logger->error('Failed to create JWT session record.', [
+                'exception' => $exception,
+                'userId' => $user->getId(),
+            ]);
+
+            throw new SessionCreationFailedException(previous: $exception);
         }
     }
 }

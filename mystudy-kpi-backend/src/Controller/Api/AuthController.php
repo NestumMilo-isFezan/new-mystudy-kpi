@@ -6,8 +6,10 @@ namespace App\Controller\Api;
 
 use JsonException;
 use App\Dto\RegistrationDto;
+use App\Exception\DomainException;
 use App\Service\AuthService;
 use App\Service\CookieService;
+use App\Service\LoginRateLimiter;
 use App\Serializer\UserResponseSerializer;
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -23,6 +25,7 @@ class AuthController extends AbstractController
     public function __construct(
         private readonly AuthService $authService,
         private readonly CookieService $cookieService,
+        private readonly LoginRateLimiter $loginRateLimiter,
         private readonly UserResponseSerializer $userResponseSerializer,
     ) {
     }
@@ -51,7 +54,17 @@ class AuthController extends AbstractController
 
         $login = (string) ($data['identifier'] ?? $data['email'] ?? '');
         $password = (string) ($data['password'] ?? '');
-        $user = $this->authService->authenticate($login, $password);
+
+        $this->loginRateLimiter->assertAllowed($request, $login);
+
+        try {
+            $user = $this->authService->authenticate($login, $password);
+        } catch (DomainException $exception) {
+            $this->loginRateLimiter->registerFailure($request, $login);
+            throw $exception;
+        }
+
+        $this->loginRateLimiter->clear($request, $login);
 
         $token = $tokenManager->create($user);
         $response = $this->json([

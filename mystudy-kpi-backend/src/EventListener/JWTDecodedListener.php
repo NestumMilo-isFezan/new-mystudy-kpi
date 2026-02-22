@@ -11,6 +11,8 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 final readonly class JWTDecodedListener
 {
+    private const int LAST_ACTIVE_UPDATE_INTERVAL_SECONDS = 300;
+
     public function __construct(
         private UserSessionRepository $userSessionRepository,
         private EntityManagerInterface $entityManager,
@@ -38,8 +40,18 @@ final readonly class JWTDecodedListener
         $request = $this->requestStack->getCurrentRequest();
         $request?->attributes->set('jwt_payload', $payload);
 
-        // Update last active time
-        $session->setLastActiveAt(new \DateTimeImmutable());
+        // Update last active time at most every 5 minutes to reduce write load.
+        $now = new \DateTimeImmutable();
+        $lastActiveAt = $session->getLastActiveAt();
+
+        if ($lastActiveAt instanceof \DateTimeImmutable) {
+            $secondsSinceLastUpdate = $now->getTimestamp() - $lastActiveAt->getTimestamp();
+            if ($secondsSinceLastUpdate < self::LAST_ACTIVE_UPDATE_INTERVAL_SECONDS) {
+                return;
+            }
+        }
+
+        $session->setLastActiveAt($now);
         $this->entityManager->flush();
     }
 }
