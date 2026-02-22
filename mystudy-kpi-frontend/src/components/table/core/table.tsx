@@ -1,6 +1,10 @@
 import { flexRender } from "@tanstack/react-table";
 import { useTableContext } from "@/components/table/core/table-control";
 import {
+	getAlignClass,
+	getStickyClass,
+} from "@/components/table/core/table-utils";
+import {
 	Table,
 	TableBody,
 	TableCell,
@@ -15,30 +19,6 @@ type CoreTableProps = {
 	emptyMessage?: string;
 	className?: string;
 };
-
-function getStickyClass(sticky?: "left" | "right") {
-	if (sticky === "left") {
-		return "sticky left-0 z-20 bg-background shadow-[8px_0_8px_-8px_hsl(var(--border))]";
-	}
-
-	if (sticky === "right") {
-		return "sticky right-0 z-20 bg-background shadow-[-8px_0_8px_-8px_hsl(var(--border))]";
-	}
-
-	return "";
-}
-
-function getAlignClass(align?: "start" | "center" | "end") {
-	if (align === "center") {
-		return "text-center";
-	}
-
-	if (align === "end") {
-		return "text-right";
-	}
-
-	return "text-left";
-}
 
 export function CoreTable({
 	emptyMessage = "No records found.",

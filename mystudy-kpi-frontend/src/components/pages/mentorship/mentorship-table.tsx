@@ -3,6 +3,7 @@ import {
 	useQuery,
 	useSuspenseQuery,
 } from "@tanstack/react-query";
+import type { ColumnFiltersState, SortingState } from "@tanstack/react-table";
 import type { LinkProps } from "@tanstack/react-router";
 import { LayoutPanelLeft, Users } from "lucide-react";
 import { useMemo } from "react";
@@ -16,32 +17,51 @@ import {
 	TableControl,
 	useTableContext,
 } from "@/components/table/core/table-control";
+import { TablePagination } from "@/components/table/core/table-pagination";
 import { TableToolbar } from "@/components/table/core/table-toolbar";
 import { Badge } from "@/components/ui/badge";
 import { allLecturersQueryOptions } from "@/lib/api/lecturers-query";
+import type {
+	MentorshipListSearch,
+	SortableMentorshipColumn,
+} from "@/lib/api/mentorship-list-params";
 import type { Mentorship } from "@/lib/api/mentorships.functions";
-import { lecturerMentorshipsQueryOptions } from "@/lib/api/mentorships-query";
+import type { PaginatedResponse } from "@/lib/api/server-function-types";
 
 type MentorshipTableProps = {
-	queryOptions?: unknown;
+	pageQueryOptions: unknown;
+	pageParams: MentorshipListSearch;
+	onPageChange: (page: number) => void;
+	onSortChange: (columnId: string, direction: "asc" | "desc" | "") => void;
+	onFilterChange: (columnId: string, value: string) => void;
 	showLecturer?: boolean;
 	rootPath?: LinkProps["to"];
 };
 
+function mapSortableToColumn(sortBy?: SortableMentorshipColumn): string | undefined {
+	if (!sortBy) return undefined;
+	return sortBy;
+}
+
 export function MentorshipTable({
-	queryOptions = lecturerMentorshipsQueryOptions,
+	pageQueryOptions,
+	pageParams,
+	onPageChange,
+	onSortChange,
+	onFilterChange,
 	showLecturer = false,
 	rootPath = "/mentorship",
 }: MentorshipTableProps) {
-	const { data: mentorships } = useSuspenseQuery(
-		queryOptions as UseSuspenseQueryOptions<Mentorship[]>,
+	const { data: pageData } = useSuspenseQuery(
+		pageQueryOptions as UseSuspenseQueryOptions<PaginatedResponse<Mentorship>>,
 	);
+	const mentorships = pageData.items;
 	const { data: allLecturers = [] } = useQuery({
 		...allLecturersQueryOptions,
 		enabled: showLecturer,
 	});
 
-	const totalMentees = mentorships.reduce(
+	const totalMenteesOnPage = mentorships.reduce(
 		(sum, item) => sum + item.menteeCount,
 		0,
 	);
@@ -56,7 +76,25 @@ export function MentorshipTable({
 		[mentorships, showLecturer, allLecturers],
 	);
 
-	if (mentorships.length === 0) {
+	const initialColumnFilters = useMemo<ColumnFiltersState>(() => {
+		const filters: ColumnFiltersState = [];
+		if (pageParams.startYear != null) {
+			filters.push({ id: "startYear", value: String(pageParams.startYear) });
+		}
+		if (showLecturer && pageParams.lecturerId) {
+			filters.push({ id: "lecturer", value: pageParams.lecturerId });
+		}
+		return filters;
+	}, [pageParams.startYear, pageParams.lecturerId, showLecturer]);
+
+	const initialSorting = useMemo<SortingState>(() => {
+		if (!pageParams.sortBy || !pageParams.sortDir) return [];
+		const columnId = mapSortableToColumn(pageParams.sortBy);
+		if (!columnId) return [];
+		return [{ id: columnId, desc: pageParams.sortDir === "desc" }];
+	}, [pageParams.sortBy, pageParams.sortDir]);
+
+	if (pageData.pagination.total === 0) {
 		return (
 			<div className="rounded-xl border border-border bg-card p-12 text-center text-muted-foreground shadow-sm">
 				<Users className="mx-auto mb-3 h-9 w-9 opacity-30" />
@@ -69,19 +107,34 @@ export function MentorshipTable({
 	}
 
 	return (
-		<TableControl data={mentorships} columns={columns} config={config}>
+		<TableControl
+			data={mentorships}
+			columns={columns}
+			config={config}
+			serverPagination={{
+				meta: pageData.pagination,
+				page: pageParams.page,
+				onPageChange,
+			}}
+			serverCallbacks={{
+				onSortChange,
+				onFilterChange,
+			}}
+			initialColumnFilters={initialColumnFilters}
+			initialSorting={initialSorting}
+		>
 			<div className="space-y-4">
 				<div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
 					<SummaryCard
 						title="Mentorship Batches"
-						value={mentorships.length}
-						description="Total intake batches you are mentoring."
+						value={pageData.pagination.total}
+						description="Total intake batches in this result set."
 						icon={LayoutPanelLeft}
 					/>
 					<SummaryCard
-						title="Total Assigned Mentees"
-						value={totalMentees}
-						description="Combined students across all batches."
+						title="Mentees (Current Page)"
+						value={totalMenteesOnPage}
+						description="Combined students for the current page."
 						icon={Users}
 					/>
 				</div>
@@ -97,6 +150,8 @@ export function MentorshipTable({
 				</div>
 
 				<MentorshipMobileList rootPath={rootPath} />
+
+				<TablePagination />
 			</div>
 		</TableControl>
 	);

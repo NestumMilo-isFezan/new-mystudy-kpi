@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { getCookie, getRequestUrl } from "@tanstack/react-start/server";
-import ky from "ky";
 import type { z } from "zod";
+import ky from "./ky";
 import {
 	type certificateTargetsSchema,
 	type levelTargetsSchema,

@@ -4,11 +4,16 @@ import { IntakeHeader } from "@/components/pages/manage-intake/intake-header";
 import { IntakeTable } from "@/components/pages/manage-intake/intake-table";
 import { IntakeTableSkeleton } from "@/components/pages/manage-intake/intake-table-skeleton";
 import { Button } from "@/components/ui/button";
-import { allIntakeBatchesQueryOptions } from "@/lib/api/intake-batches-query";
+import { intakeListSearchSchema } from "@/lib/api/intake-list-params";
+import { intakeBatchesPageQueryOptions } from "@/lib/api/intake-batches-query";
 
 export const Route = createFileRoute("/_auth/_staff/staff/intake/")({
-	loader: async ({ context }) => {
-		await context.queryClient.ensureQueryData(allIntakeBatchesQueryOptions);
+	validateSearch: (search) => intakeListSearchSchema.parse(search),
+	loader: async ({ context, location }) => {
+		const search = intakeListSearchSchema.parse(
+			Object.fromEntries(new URLSearchParams(location.search)),
+		);
+		await context.queryClient.ensureQueryData(intakeBatchesPageQueryOptions(search));
 	},
 	errorComponent: IntakesErrorComponent,
 	component: ManageIntakePage,

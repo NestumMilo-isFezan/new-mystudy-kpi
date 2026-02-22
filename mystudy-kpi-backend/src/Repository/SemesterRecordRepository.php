@@ -6,6 +6,7 @@ namespace App\Repository;
 
 use App\Entity\SemesterRecord;
 use App\Entity\User;
+use App\Enum\SortableAcademicColumn;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -32,5 +33,46 @@ class SemesterRecordRepository extends ServiceEntityRepository
             ->setMaxResults(1)
             ->getQuery()
             ->getOneOrNullResult();
+    }
+
+    /**
+     * @return SemesterRecord[]
+     */
+    public function findByStudentSortedFiltered(
+        User $student,
+        SortableAcademicColumn $sortBy,
+        string $sortDir,
+        ?int $semester = null,
+    ): array {
+        $direction = $sortDir === 'DESC' ? 'DESC' : 'ASC';
+
+        $qb = $this->createQueryBuilder('s')
+            ->leftJoin('s.cgpaRecord', 'c')
+            ->where('s.student = :student')
+            ->setParameter('student', $student);
+
+        if ($semester !== null) {
+            $qb->andWhere('s.semester = :semester')->setParameter('semester', $semester);
+        }
+
+        if ($sortBy === SortableAcademicColumn::AcademicYear) {
+            $qb
+                ->orderBy('s.academicYear', $direction)
+                ->addOrderBy('s.semester', $direction)
+                ->addOrderBy('s.id', 'DESC');
+        } elseif ($sortBy === SortableAcademicColumn::Semester) {
+            $qb
+                ->orderBy('s.semester', $direction)
+                ->addOrderBy('s.academicYear', $direction)
+                ->addOrderBy('s.id', 'DESC');
+        } else {
+            $qb
+                ->orderBy('c.gpa', $direction)
+                ->addOrderBy('s.academicYear', 'DESC')
+                ->addOrderBy('s.semester', 'DESC')
+                ->addOrderBy('s.id', 'DESC');
+        }
+
+        return $qb->getQuery()->getResult();
     }
 }

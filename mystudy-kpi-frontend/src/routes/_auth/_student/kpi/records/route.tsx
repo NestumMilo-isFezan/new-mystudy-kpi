@@ -5,21 +5,20 @@ import {
 	useLocation,
 	useSearch,
 } from "@tanstack/react-router";
-import { z } from "zod";
 import { KpiRecordsHeader } from "@/components/pages/manage-kpi-records/kpi-records-header";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { academicsQueryOptions } from "@/lib/api/academics-query";
-import { kpiRecordsQueryOptions } from "@/lib/api/kpi-records-query";
-
-const recordsSearchSchema = z.object({
-	type: z.enum(["all", "activity", "competition", "certification"]).optional(),
-});
+import { kpiRecordListSearchSchema } from "@/lib/api/kpi-record-list-params";
+import { kpiRecordsPageQueryOptions } from "@/lib/api/kpi-records-query";
 
 export const Route = createFileRoute("/_auth/_student/kpi/records")({
-	validateSearch: (search) => recordsSearchSchema.parse(search),
-	loader: async ({ context }) => {
+	validateSearch: (search) => kpiRecordListSearchSchema.parse(search),
+	loader: async ({ context, location }) => {
+		const search = kpiRecordListSearchSchema.parse(
+			Object.fromEntries(new URLSearchParams(location.search)),
+		);
 		await Promise.all([
-			context.queryClient.ensureQueryData(kpiRecordsQueryOptions),
+			context.queryClient.ensureQueryData(kpiRecordsPageQueryOptions(search)),
 			context.queryClient.ensureQueryData(academicsQueryOptions),
 		]);
 	},
@@ -41,25 +40,25 @@ function KpiRecordsLayout() {
 					<TabsList>
 						<TabsTrigger
 							value="all"
-							render={<Link to="." search={{ type: "all" }} />}
+							render={<Link to="." search={(prev) => ({ ...prev, page: 1, type: undefined })} />}
 						>
 							All Records
 						</TabsTrigger>
 						<TabsTrigger
 							value="activity"
-							render={<Link to="." search={{ type: "activity" }} />}
+							render={<Link to="." search={(prev) => ({ ...prev, page: 1, type: "activity" })} />}
 						>
 							Activities
 						</TabsTrigger>
 						<TabsTrigger
 							value="competition"
-							render={<Link to="." search={{ type: "competition" }} />}
+							render={<Link to="." search={(prev) => ({ ...prev, page: 1, type: "competition" })} />}
 						>
 							Competitions
 						</TabsTrigger>
 						<TabsTrigger
 							value="certification"
-							render={<Link to="." search={{ type: "certification" }} />}
+							render={<Link to="." search={(prev) => ({ ...prev, page: 1, type: "certification" })} />}
 						>
 							Certifications
 						</TabsTrigger>

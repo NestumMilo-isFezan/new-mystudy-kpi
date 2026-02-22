@@ -8,9 +8,11 @@ use App\Dto\UserCreateDto;
 use App\Dto\UserUpdateDto;
 use App\Entity\Profile;
 use App\Entity\User;
+use App\Enum\SortableUserColumn;
 use App\Enum\UserRole;
 use App\Exception\DuplicateIdentifierException;
 use App\Exception\InvalidIntakeBatchException;
+use App\Exception\NotFoundException;
 use App\Repository\IntakeBatchRepository;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -27,19 +29,39 @@ final class AdminUserService
     }
 
     /**
+     * Returns all lecturers (unbounded) for use in assignment dropdowns.
+     * Not paginated — use only for small, bounded reference lists.
+     *
      * @return User[]
      */
     public function findAllLecturers(): array
     {
-        return $this->userRepository->findBy(['role' => UserRole::LECTURER]);
+        return $this->userRepository->findAllByRole(UserRole::LECTURER);
     }
 
     /**
-     * @return User[]
+     * @return array{items: User[], total: int}
      */
-    public function findAllStudents(): array
-    {
-        return $this->userRepository->findBy(['role' => UserRole::STUDENT]);
+    public function findLecturersPage(
+        int $page,
+        int $limit,
+        SortableUserColumn $sortBy = SortableUserColumn::Identifier,
+        string $sortDir = 'ASC',
+    ): array {
+        return $this->userRepository->findByRolePaginated(UserRole::LECTURER, $page, $limit, $sortBy, $sortDir);
+    }
+
+    /**
+     * @return array{items: User[], total: int}
+     */
+    public function findStudentsPage(
+        int $page,
+        int $limit,
+        SortableUserColumn $sortBy = SortableUserColumn::Identifier,
+        string $sortDir = 'ASC',
+        ?int $startYear = null,
+    ): array {
+        return $this->userRepository->findByRolePaginated(UserRole::STUDENT, $page, $limit, $sortBy, $sortDir, $startYear);
     }
 
     public function createLecturer(UserCreateDto $dto): User
@@ -115,7 +137,7 @@ final class AdminUserService
         $user = $this->userRepository->find($id);
 
         if (!$user || $user->getRole() !== UserRole::LECTURER) {
-            throw new \InvalidArgumentException('Lecturer not found.');
+            throw new NotFoundException('Lecturer not found.');
         }
 
         return $this->updateUser($user, $dto);
@@ -126,7 +148,7 @@ final class AdminUserService
         $user = $this->userRepository->find($id);
 
         if (!$user || $user->getRole() !== UserRole::STUDENT) {
-            throw new \InvalidArgumentException('Student not found.');
+            throw new NotFoundException('Student not found.');
         }
 
         if ($intakeBatchId !== null) {
@@ -181,7 +203,7 @@ final class AdminUserService
         $user = $this->userRepository->find($id);
 
         if (!$user) {
-            throw new \InvalidArgumentException('User not found.');
+            throw new NotFoundException('User not found.');
         }
 
         $this->entityManager->remove($user);
@@ -193,7 +215,7 @@ final class AdminUserService
         $user = $this->userRepository->find($id);
 
         if (!$user || $user->getRole() !== UserRole::LECTURER) {
-            throw new \InvalidArgumentException('Lecturer not found.');
+            throw new NotFoundException('Lecturer not found.');
         }
 
         $this->deleteUser($id);
@@ -204,7 +226,7 @@ final class AdminUserService
         $user = $this->userRepository->find($id);
 
         if (!$user || $user->getRole() !== UserRole::STUDENT) {
-            throw new \InvalidArgumentException('Student not found.');
+            throw new NotFoundException('Student not found.');
         }
 
         $this->deleteUser($id);

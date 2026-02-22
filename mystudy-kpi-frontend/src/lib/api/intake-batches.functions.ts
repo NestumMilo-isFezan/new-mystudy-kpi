@@ -1,6 +1,8 @@
 import { createServerFn } from "@tanstack/react-start";
 import { getCookie, getRequestUrl } from "@tanstack/react-start/server";
-import ky from "ky";
+import { intakeListParamsSchema } from "./intake-list-params";
+import ky from "./ky";
+import type { PaginatedResponse } from "./server-function-types";
 
 export type IntakeBatch = {
 	id: number;
@@ -43,6 +45,29 @@ export const getAllIntakeBatchesFn = createServerFn({ method: "GET" }).handler(
 			.json<IntakeBatch[]>();
 	},
 );
+
+export const getIntakeBatchesPageFn = createServerFn({ method: "GET" })
+	.inputValidator((params: unknown) => intakeListParamsSchema.parse(params))
+	.handler(async ({ data: params }) => {
+		const authToken = getCookie("AUTH_TOKEN");
+		const searchParams: Record<string, string> = {
+			page: String(params.page),
+			limit: String(params.limit),
+		};
+		if (params.sortBy) searchParams.sortBy = params.sortBy;
+		if (params.sortDir) searchParams.sortDir = params.sortDir;
+		if (params.status) searchParams.status = params.status;
+
+		return await ky
+			.get(`${getApiBaseUrl()}/api/admin/intake-batches/page`, {
+				searchParams,
+				headers: {
+					Accept: "application/json",
+					Cookie: `AUTH_TOKEN=${authToken}`,
+				},
+			})
+			.json<PaginatedResponse<IntakeBatch>>();
+	});
 
 export const createIntakeBatchFn = createServerFn({ method: "POST" })
 	.inputValidator((startYear: number) => startYear)

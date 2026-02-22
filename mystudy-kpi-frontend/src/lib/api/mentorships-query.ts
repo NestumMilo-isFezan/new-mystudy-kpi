@@ -1,11 +1,14 @@
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
+import type { MentorshipListParams } from "./mentorship-list-params";
 import {
 	getAdminMentorshipByIdFn,
 	getAdminMentorshipsFn,
+	getAdminMentorshipsPageFn,
 	getAvailableStudentsAdminFn,
 	getAvailableStudentsFn,
 	getLecturerMentorshipByIdFn,
 	getLecturerMentorshipsFn,
+	getLecturerMentorshipsPageFn,
 } from "./mentorships.functions";
 
 export const lecturerMentorshipsQueryOptions = queryOptions({
@@ -17,6 +20,22 @@ export const adminMentorshipsQueryOptions = queryOptions({
 	queryKey: ["admin-mentorships"] as const,
 	queryFn: () => getAdminMentorshipsFn(),
 });
+
+export const lecturerMentorshipsPageQueryOptions = (
+	params: MentorshipListParams,
+) =>
+	queryOptions({
+		queryKey: ["lecturer-mentorships", "page", params] as const,
+		queryFn: () => getLecturerMentorshipsPageFn({ data: params }),
+		staleTime: 30_000,
+	});
+
+export const adminMentorshipsPageQueryOptions = (params: MentorshipListParams) =>
+	queryOptions({
+		queryKey: ["admin-mentorships", "page", params] as const,
+		queryFn: () => getAdminMentorshipsPageFn({ data: params }),
+		staleTime: 30_000,
+	});
 
 export const mentorshipByIdQueryOptions = (id: number) =>
 	queryOptions({

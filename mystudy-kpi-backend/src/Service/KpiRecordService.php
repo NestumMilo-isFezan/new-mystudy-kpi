@@ -7,6 +7,9 @@ namespace App\Service;
 use App\Dto\KpiRecordDto;
 use App\Entity\KpiRecord;
 use App\Entity\User;
+use App\Enum\SortableKpiRecordColumn;
+use App\Exception\NotFoundException;
+use App\Exception\ResourceRequiredException;
 use App\Repository\KpiRecordRepository;
 use App\Repository\SemesterRecordRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -28,10 +31,31 @@ class KpiRecordService
         return $this->kpiRecordRepository->findByStudent($student);
     }
 
+    /**
+     * @return array{items: KpiRecord[], total: int}
+     */
+    public function listRecordsPage(
+        User $student,
+        int $page,
+        int $limit,
+        SortableKpiRecordColumn $sortBy,
+        string $sortDir,
+        ?string $type = null,
+    ): array {
+        return $this->kpiRecordRepository->findByStudentPaginated(
+            $student,
+            $page,
+            $limit,
+            $sortBy,
+            $sortDir,
+            $type,
+        );
+    }
+
     public function createRecord(User $student, KpiRecordDto $dto): KpiRecord
     {
         if (null === $dto->semesterRecordId) {
-            throw new \InvalidArgumentException('Semester record ID is required.');
+            throw new ResourceRequiredException('Semester record ID is required.');
         }
 
         $semesterRecord = $this->semesterRecordRepository->findOneBy([
@@ -40,7 +64,7 @@ class KpiRecordService
         ]);
 
         if (null === $semesterRecord) {
-            throw new \InvalidArgumentException('Semester record not found.');
+            throw new NotFoundException('Semester record not found.');
         }
 
         $record = (new KpiRecord())->setRecord($semesterRecord);
@@ -57,7 +81,7 @@ class KpiRecordService
         $record = $this->kpiRecordRepository->find($id);
 
         if (null === $record || $record->getRecord()->getStudent() !== $student) {
-            throw new \InvalidArgumentException('KPI record not found.');
+            throw new NotFoundException('KPI record not found.');
         }
 
         $this->populateRecord($record, $dto);
@@ -73,7 +97,7 @@ class KpiRecordService
         $record = $this->kpiRecordRepository->find($id);
 
         if (null === $record || $record->getRecord()->getStudent() !== $student) {
-            throw new \InvalidArgumentException('KPI record not found.');
+            throw new NotFoundException('KPI record not found.');
         }
 
         $this->entityManager->remove($record);

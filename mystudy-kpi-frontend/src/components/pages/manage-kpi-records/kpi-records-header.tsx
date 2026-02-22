@@ -30,11 +30,17 @@ export function KpiRecordsHeader() {
 				<Button
 					type="button"
 					variant="secondary"
-					render={
+						render={
 						isAnalytics ? (
-							<Link to="/kpi/records" />
+							<Link
+								to="/kpi/records"
+								search={{ page: 1, limit: 25 }}
+							/>
 						) : (
-							<Link to="/kpi/records/analytics" />
+							<Link
+								to="/kpi/records/analytics"
+								search={{ page: 1, limit: 25 }}
+							/>
 						)
 					}
 					className="w-full md:w-auto"

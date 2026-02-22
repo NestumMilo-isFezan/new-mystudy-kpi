@@ -7,9 +7,11 @@ namespace App\Controller\Api;
 use App\Dto\UserCreateDto;
 use App\Dto\UserUpdateDto;
 use App\Service\AdminUserService;
+use App\Service\PaginationService;
 use App\Serializer\UserResponseSerializer;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -20,21 +22,41 @@ class AdminStudentController extends AbstractController
 {
     public function __construct(
         private readonly AdminUserService $adminUserService,
+        private readonly PaginationService $paginationService,
         private readonly UserResponseSerializer $userResponseSerializer,
     ) {
     }
 
     #[Route('', name: 'api_admin_students_list', methods: ['GET'])]
-    public function list(): JsonResponse
+    public function list(Request $request): JsonResponse
     {
-        $students = $this->adminUserService->findAllStudents();
+        $pagination = $this->paginationService->resolve($request);
+        $sort = $this->paginationService->resolveUserSort($request);
+        $startYearRaw = $this->paginationService->resolveFilter($request, 'startYear');
+        $startYear = $startYearRaw !== null ? (int) $startYearRaw : null;
+
+        $resultPage = $this->adminUserService->findStudentsPage(
+            $pagination['page'],
+            $pagination['limit'],
+            $sort['sortBy'],
+            $sort['sortDir'],
+            $startYear,
+        );
+
         $result = [];
 
-        foreach ($students as $student) {
+        foreach ($resultPage['items'] as $student) {
             $result[] = $this->userResponseSerializer->serialize($student);
         }
 
-        return $this->json($result);
+        return $this->json([
+            'items' => $result,
+            'pagination' => $this->paginationService->metadata(
+                $pagination['page'],
+                $pagination['limit'],
+                $resultPage['total']
+            ),
+        ]);
     }
 
     #[Route('', name: 'api_admin_students_create', methods: ['POST'])]

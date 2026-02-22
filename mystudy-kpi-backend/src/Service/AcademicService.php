@@ -9,6 +9,8 @@ use App\Dto\SemesterRecordDto;
 use App\Entity\CgpaRecord;
 use App\Entity\SemesterRecord;
 use App\Entity\User;
+use App\Enum\SortableAcademicColumn;
+use App\Exception\NotFoundException;
 use App\Repository\SemesterRecordRepository;
 use Doctrine\ORM\EntityManagerInterface;
 
@@ -35,6 +37,27 @@ class AcademicService
         }
 
         return $records;
+    }
+
+    /**
+     * @return SemesterRecord[]
+     */
+    public function listRecordsSortedFiltered(
+        User $student,
+        SortableAcademicColumn $sortBy,
+        string $sortDir,
+        ?int $semester = null,
+    ): array {
+        if ($this->semesterRecordRepository->count(['student' => $student]) === 0) {
+            $this->scaffoldStandardSemesters($student);
+        }
+
+        return $this->semesterRecordRepository->findByStudentSortedFiltered(
+            $student,
+            $sortBy,
+            $sortDir,
+            $semester,
+        );
     }
 
     public function scaffoldStandardSemesters(User $student): array
@@ -102,7 +125,7 @@ class AcademicService
         ]);
 
         if (null === $record) {
-            throw new \InvalidArgumentException('Semester record not found.');
+            throw new NotFoundException('Semester record not found.');
         }
 
         $this->updateGpa($record, $dto->gpa);

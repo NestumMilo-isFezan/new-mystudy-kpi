@@ -17,8 +17,10 @@ use App\Service\KpiAggregationService;
 use App\Service\KpiAimService;
 use App\Service\KpiRecordService;
 use App\Service\MentorshipService;
+use App\Service\PaginationService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -34,6 +36,7 @@ final class LecturerMentorshipStudentController extends AbstractController
         private readonly ChallengeService $challengeService,
         private readonly KpiAimService $kpiAimService,
         private readonly KpiAggregationService $kpiAggregationService,
+        private readonly PaginationService $paginationService,
         private readonly UserResponseSerializer $userSerializer,
         private readonly AcademicResponseSerializer $academicSerializer,
         private readonly KpiRecordResponseSerializer $kpiRecordSerializer,
@@ -68,11 +71,19 @@ final class LecturerMentorshipStudentController extends AbstractController
     }
 
     #[Route('/{id}/academics', name: 'api_lecturer_mentorships_students_academics', methods: ['GET'])]
-    public function academics(string $id): JsonResponse
+    public function academics(string $id, Request $request): JsonResponse
     {
         try {
             $student = $this->getMentee($id);
-            $records = $this->academicService->listRecords($student);
+            $sort = $this->paginationService->resolveAcademicSort($request);
+            $semesterRaw = $this->paginationService->resolveFilter($request, 'semester');
+            $semester = $semesterRaw !== null ? (int) $semesterRaw : null;
+            $records = $this->academicService->listRecordsSortedFiltered(
+                $student,
+                $sort['sortBy'],
+                $sort['sortDir'],
+                $semester,
+            );
 
             return $this->json($this->academicSerializer->serializeCollection($records));
         } catch (\InvalidArgumentException $e) {
@@ -93,6 +104,38 @@ final class LecturerMentorshipStudentController extends AbstractController
         }
     }
 
+    #[Route('/{id}/kpi-records/page', name: 'api_lecturer_mentorships_students_kpi_records_page', methods: ['GET'])]
+    public function kpiRecordsPage(string $id, Request $request): JsonResponse
+    {
+        try {
+            $student = $this->getMentee($id);
+            $pagination = $this->paginationService->resolve($request);
+            $sort = $this->paginationService->resolveKpiRecordSort($request);
+            $typeRaw = $this->paginationService->resolveFilter($request, 'type');
+            $type = in_array($typeRaw, ['activity', 'competition', 'certification'], true) ? $typeRaw : null;
+
+            $resultPage = $this->kpiRecordService->listRecordsPage(
+                $student,
+                $pagination['page'],
+                $pagination['limit'],
+                $sort['sortBy'],
+                $sort['sortDir'],
+                $type,
+            );
+
+            return $this->json([
+                'items' => $this->kpiRecordSerializer->serializeCollection($resultPage['items']),
+                'pagination' => $this->paginationService->metadata(
+                    $pagination['page'],
+                    $pagination['limit'],
+                    $resultPage['total'],
+                ),
+            ]);
+        } catch (\InvalidArgumentException $e) {
+            return $this->json(['message' => $e->getMessage()], JsonResponse::HTTP_NOT_FOUND);
+        }
+    }
+
     #[Route('/{id}/challenges', name: 'api_lecturer_mentorships_students_challenges', methods: ['GET'])]
     public function challenges(string $id): JsonResponse
     {
@@ -101,6 +144,38 @@ final class LecturerMentorshipStudentController extends AbstractController
             $challenges = $this->challengeService->listChallenges($student);
 
             return $this->json($this->challengeSerializer->serializeCollection($challenges));
+        } catch (\InvalidArgumentException $e) {
+            return $this->json(['message' => $e->getMessage()], JsonResponse::HTTP_NOT_FOUND);
+        }
+    }
+
+    #[Route('/{id}/challenges/page', name: 'api_lecturer_mentorships_students_challenges_page', methods: ['GET'])]
+    public function challengesPage(string $id, Request $request): JsonResponse
+    {
+        try {
+            $student = $this->getMentee($id);
+            $pagination = $this->paginationService->resolve($request);
+            $sort = $this->paginationService->resolveChallengeSort($request);
+            $semesterRaw = $this->paginationService->resolveFilter($request, 'semester');
+            $semester = $semesterRaw !== null ? (int) $semesterRaw : null;
+
+            $resultPage = $this->challengeService->listChallengesPage(
+                $student,
+                $pagination['page'],
+                $pagination['limit'],
+                $sort['sortBy'],
+                $sort['sortDir'],
+                $semester,
+            );
+
+            return $this->json([
+                'items' => $this->challengeSerializer->serializeCollection($resultPage['items']),
+                'pagination' => $this->paginationService->metadata(
+                    $pagination['page'],
+                    $pagination['limit'],
+                    $resultPage['total'],
+                ),
+            ]);
         } catch (\InvalidArgumentException $e) {
             return $this->json(['message' => $e->getMessage()], JsonResponse::HTTP_NOT_FOUND);
         }

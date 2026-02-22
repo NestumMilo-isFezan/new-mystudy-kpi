@@ -6,13 +6,30 @@ export const challengeTableControlConfig: TableControlConfig = {
 		desktopColumns: ["challenge", "plan"],
 		mobileColumns: ["challenge", "plan"],
 	},
-	filters: [],
+	filters: [
+		{
+			columnId: "semesterNumber",
+			label: "Semester",
+			placeholder: "Filter semester",
+			options: [
+				{ label: "Semester 1", value: "1" },
+				{ label: "Semester 2", value: "2" },
+				{ label: "Short Semester", value: "3" },
+			],
+		},
+	],
 	sortOptions: [
 		{ columnId: "semester", label: "Semester" },
 		{ columnId: "challenge", label: "Challenge" },
 	],
 	columns: [
 		{ columnId: "semester", label: "Semester", hideable: false },
+		{
+			columnId: "semesterNumber",
+			label: "Semester Number",
+			hideable: true,
+			hiddenByDefault: true,
+		},
 		{ columnId: "challenge", label: "Challenge", hideable: false },
 		{ columnId: "plan", label: "Plan", hideable: true },
 		{ columnId: "actions", label: "Actions", hideable: false },

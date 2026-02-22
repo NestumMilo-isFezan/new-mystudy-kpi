@@ -7,6 +7,9 @@ namespace App\Service;
 use App\Entity\Mentee;
 use App\Entity\Mentorship;
 use App\Entity\User;
+use App\Exception\NotFoundException;
+use App\Exception\UnauthorizedException;
+use App\Enum\SortableMentorshipColumn;
 use App\Repository\IntakeBatchRepository;
 use App\Repository\MenteeRepository;
 use App\Repository\MentorshipRepository;
@@ -33,11 +36,53 @@ final class MentorshipService
     }
 
     /**
+     * @return array{items: array<int, array{mentorship: Mentorship, menteeCount: int, mentees: array<int, User>}>, total: int}
+     */
+    public function findByLecturerPage(
+        User $lecturer,
+        int $page,
+        int $limit,
+        SortableMentorshipColumn $sortBy,
+        string $sortDir,
+        ?int $startYear = null,
+    ): array {
+        return $this->mentorshipRepository->findByLecturerPaginated(
+            $lecturer,
+            $page,
+            $limit,
+            $sortBy,
+            $sortDir,
+            $startYear,
+        );
+    }
+
+    /**
      * @return array Array of arrays containing 'mentorship', 'menteeCount', and 'mentees' (limited to 5)
      */
     public function findAllForIndex(): array
     {
         return $this->mentorshipRepository->findAllWithCountsAndLimitedMentees();
+    }
+
+    /**
+     * @return array{items: array<int, array{mentorship: Mentorship, menteeCount: int, mentees: array<int, User>}>, total: int}
+     */
+    public function findAllPage(
+        int $page,
+        int $limit,
+        SortableMentorshipColumn $sortBy,
+        string $sortDir,
+        ?int $startYear = null,
+        ?string $lecturerId = null,
+    ): array {
+        return $this->mentorshipRepository->findAllPaginated(
+            $page,
+            $limit,
+            $sortBy,
+            $sortDir,
+            $startYear,
+            $lecturerId,
+        );
     }
 
     /**
@@ -52,7 +97,7 @@ final class MentorshipService
     {
         $mentorship = $this->mentorshipRepository->find($id);
         if (!$mentorship || $mentorship->getLecturer()->getId() !== $lecturer->getId()) {
-            throw new \InvalidArgumentException('Mentorship record not found or access denied.');
+            throw new NotFoundException('Mentorship record not found or access denied.');
         }
 
         return $mentorship;
@@ -62,7 +107,7 @@ final class MentorshipService
     {
         $mentorship = $this->mentorshipRepository->find($id);
         if (!$mentorship) {
-            throw new \InvalidArgumentException('Mentorship record not found.');
+            throw new NotFoundException('Mentorship record not found.');
         }
 
         return $mentorship;
@@ -72,7 +117,7 @@ final class MentorshipService
     {
         $mentee = $this->menteeRepository->findOneByStudentIdAndLecturer($studentId, $lecturer);
         if (!$mentee) {
-            throw new \InvalidArgumentException('Student not found in your mentorship list.');
+            throw new NotFoundException('Student not found in your mentorship list.');
         }
 
         return $mentee;
@@ -90,12 +135,12 @@ final class MentorshipService
     {
         $student = $this->userRepository->find($studentId);
         if (!$student) {
-            throw new \InvalidArgumentException('Student not found.');
+            throw new NotFoundException('Student not found.');
         }
 
         $mentee = $this->menteeRepository->findOneBy(['student' => $student]);
         if (!$mentee) {
-            throw new \InvalidArgumentException('Student is not assigned to any lecturer.');
+            throw new NotFoundException('Student is not assigned to any lecturer.');
         }
 
         $mentee->setNotes($notes);
@@ -119,7 +164,7 @@ final class MentorshipService
     {
         $lecturer = $this->userRepository->find($lecturerId);
         if (!$lecturer || $lecturer->getRole()->value !== \App\Enum\UserRole::LECTURER->value) {
-            throw new \InvalidArgumentException('Lecturer not found.');
+            throw new NotFoundException('Lecturer not found.');
         }
 
         return $this->createMentorship($lecturer, $batchId, $studentIds);
@@ -134,7 +179,7 @@ final class MentorshipService
 
         $batch = $this->intakeBatchRepository->find($batchId);
         if (!$batch) {
-            throw new \InvalidArgumentException('Intake batch not found.');
+            throw new NotFoundException('Intake batch not found.');
         }
 
         $mentorship = $this->mentorshipRepository->findOneBy([
@@ -178,16 +223,16 @@ final class MentorshipService
     {
         $student = $this->userRepository->find($studentId);
         if (!$student) {
-            throw new \InvalidArgumentException('Student not found.');
+            throw new NotFoundException('Student not found.');
         }
 
         $mentee = $this->menteeRepository->findOneBy(['student' => $student]);
         if (!$mentee) {
-            throw new \InvalidArgumentException('Student is not a mentee.');
+            throw new NotFoundException('Student is not a mentee.');
         }
 
         if ($mentee->getMentorship()->getLecturer()->getId() !== $lecturer->getId()) {
-            throw new \InvalidArgumentException('Unauthorized.');
+            throw new UnauthorizedException();
         }
 
         $mentorship = $mentee->getMentorship();
@@ -206,12 +251,12 @@ final class MentorshipService
     {
         $student = $this->userRepository->find($studentId);
         if (!$student) {
-            throw new \InvalidArgumentException('Student not found.');
+            throw new NotFoundException('Student not found.');
         }
 
         $mentee = $this->menteeRepository->findOneBy(['student' => $student]);
         if (!$mentee) {
-            throw new \InvalidArgumentException('Student is not a mentee.');
+            throw new NotFoundException('Student is not a mentee.');
         }
 
         $mentorship = $mentee->getMentorship();
@@ -229,11 +274,11 @@ final class MentorshipService
     {
         $mentorship = $this->mentorshipRepository->find($mentorshipId);
         if (!$mentorship) {
-            throw new \InvalidArgumentException('Mentorship record not found.');
+            throw new NotFoundException('Mentorship record not found.');
         }
 
         if ($mentorship->getLecturer()->getId() !== $lecturer->getId()) {
-            throw new \InvalidArgumentException('Unauthorized.');
+            throw new UnauthorizedException();
         }
 
         $this->entityManager->remove($mentorship);

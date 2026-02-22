@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace App\Service;
 
 use App\Entity\IntakeBatch;
+use App\Enum\SortableIntakeColumn;
 use App\Exception\DuplicateIntakeBatchException;
+use App\Exception\NotFoundException;
 use App\Repository\IntakeBatchRepository;
 use Doctrine\ORM\EntityManagerInterface;
 
@@ -40,12 +42,31 @@ final class IntakeBatchService
         return $this->intakeBatchRepository->findBy([], ['startYear' => 'ASC']);
     }
 
+    /**
+     * @return array{items: IntakeBatch[], total: int}
+     */
+    public function findBatchesPage(
+        int $page,
+        int $limit,
+        SortableIntakeColumn $sortBy,
+        string $sortDir,
+        ?bool $isActive = null,
+    ): array {
+        return $this->intakeBatchRepository->findPaginated(
+            $page,
+            $limit,
+            $sortBy,
+            $sortDir,
+            $isActive,
+        );
+    }
+
     public function toggleBatchStatus(int $id): IntakeBatch
     {
         $batch = $this->intakeBatchRepository->find($id);
 
         if (!$batch) {
-            throw new \InvalidArgumentException('Intake batch not found.');
+            throw new NotFoundException('Intake batch not found.');
         }
 
         $batch->setIsActive(!$batch->isActive());
@@ -59,7 +80,7 @@ final class IntakeBatchService
         $batch = $this->intakeBatchRepository->find($id);
 
         if (!$batch) {
-            throw new \InvalidArgumentException('Intake batch not found.');
+            throw new NotFoundException('Intake batch not found.');
         }
 
         $existingBatch = $this->intakeBatchRepository->findOneByStartYear($startYear);
@@ -80,7 +101,7 @@ final class IntakeBatchService
         $batch = $this->intakeBatchRepository->find($id);
 
         if (!$batch) {
-            throw new \InvalidArgumentException('Intake batch not found.');
+            throw new NotFoundException('Intake batch not found.');
         }
 
         $this->entityManager->remove($batch);

@@ -35,7 +35,6 @@ export function getStudentTableControlConfig(
 			{ columnId: "identifier", label: "Student ID" },
 			{ columnId: "fullName", label: "Full Name" },
 			{ columnId: "email", label: "Email" },
-			{ columnId: "intakeName", label: "Intake" },
 			{ columnId: "startYear", label: "Start Year" },
 		],
 		columns: [

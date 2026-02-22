@@ -43,8 +43,9 @@ export const getStudentTableColumns = (): ColumnDef<Student>[] => [
 	{
 		id: "intakeName",
 		accessorFn: (row) => row.intake?.name,
-		header: ({ column }) => <SortCell column={column} label="Intake" />,
+		header: () => <HeaderCell>Intake</HeaderCell>,
 		cell: ({ row }) => <DataCell value={row.original.intake?.name ?? "-"} />,
+		enableSorting: false,
 		meta: {
 			hideable: true,
 		},
@@ -52,6 +53,7 @@ export const getStudentTableColumns = (): ColumnDef<Student>[] => [
 	{
 		id: "startYear",
 		accessorFn: (row) => row.intake?.startYear,
+		filterFn: "selectEquals",
 		header: ({ column }) => <SortCell column={column} label="Start Year" />,
 		cell: ({ row }) => (
 			<DataCell value={row.original.intake?.startYear?.toString() ?? "-"} />

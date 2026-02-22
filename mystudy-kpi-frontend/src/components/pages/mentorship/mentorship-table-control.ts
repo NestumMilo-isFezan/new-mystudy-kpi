@@ -15,23 +15,27 @@ export function getMentorshipTableControlConfig(
 		allLecturers.length > 0
 			? allLecturers.map((l) => ({
 					label: `${l.firstName} ${l.lastName}`,
-					value: `${l.firstName} ${l.lastName}`,
-				}))
+					value: l.id,
+			  }))
 			: Array.from(
 					new Set(
 						mentorships
 							.map((m) =>
 								m.lecturer
-									? `${m.lecturer.firstName} ${m.lecturer.lastName}`
+									? JSON.stringify({
+										id: m.lecturer.id,
+										label: `${m.lecturer.firstName} ${m.lecturer.lastName}`,
+									})
 									: null,
 							)
 							.filter(Boolean),
 					),
 				)
-					.sort()
-					.map((name) => ({
-						label: name as string,
-						value: name as string,
+					.map((value) => JSON.parse(value as string) as { id: string; label: string })
+					.sort((a, b) => a.label.localeCompare(b.label))
+					.map((lecturer) => ({
+						label: lecturer.label,
+						value: lecturer.id,
 					}));
 
 	const filters = [

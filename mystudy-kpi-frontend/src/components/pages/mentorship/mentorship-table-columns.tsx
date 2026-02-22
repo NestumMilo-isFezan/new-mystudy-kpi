@@ -46,6 +46,10 @@ export const getMentorshipTableColumns = (
 				row.lecturer
 					? `${row.lecturer.firstName} ${row.lecturer.lastName}`
 					: "-",
+			filterFn: (row, _columnId, value) => {
+				if (!value) return true;
+				return row.original.lecturer?.id === String(value);
+			},
 			header: ({ column }) => <SortCell column={column} label="Lecturer" />,
 			cell: ({ row }) => {
 				const lecturer = row.original.lecturer;

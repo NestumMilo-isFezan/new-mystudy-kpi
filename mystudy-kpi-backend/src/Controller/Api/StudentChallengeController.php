@@ -8,8 +8,10 @@ use App\Dto\ChallengeDto;
 use App\Entity\User;
 use App\Serializer\ChallengeResponseSerializer;
 use App\Service\ChallengeService;
+use App\Service\PaginationService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -20,6 +22,7 @@ class StudentChallengeController extends AbstractController
 {
     public function __construct(
         private readonly ChallengeService $challengeService,
+        private readonly PaginationService $paginationService,
         private readonly ChallengeResponseSerializer $serializer,
     ) {
     }
@@ -32,6 +35,36 @@ class StudentChallengeController extends AbstractController
         $challenges = $this->challengeService->listChallenges($user);
 
         return $this->json($this->serializer->serializeCollection($challenges));
+    }
+
+    #[Route('/page', name: 'api_student_challenges_page', methods: ['GET'])]
+    public function listPage(Request $request): JsonResponse
+    {
+        /** @var User $user */
+        $user = $this->getUser();
+
+        $pagination = $this->paginationService->resolve($request);
+        $sort = $this->paginationService->resolveChallengeSort($request);
+        $semesterRaw = $this->paginationService->resolveFilter($request, 'semester');
+        $semester = $semesterRaw !== null ? (int) $semesterRaw : null;
+
+        $resultPage = $this->challengeService->listChallengesPage(
+            $user,
+            $pagination['page'],
+            $pagination['limit'],
+            $sort['sortBy'],
+            $sort['sortDir'],
+            $semester,
+        );
+
+        return $this->json([
+            'items' => $this->serializer->serializeCollection($resultPage['items']),
+            'pagination' => $this->paginationService->metadata(
+                $pagination['page'],
+                $pagination['limit'],
+                $resultPage['total'],
+            ),
+        ]);
     }
 
     #[Route('', name: 'api_student_challenges_create', methods: ['POST'])]

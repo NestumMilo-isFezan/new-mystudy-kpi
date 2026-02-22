@@ -8,9 +8,12 @@ export const Route = createFileRoute(
 	"/_auth/_lecturer/mentorship/students/$id",
 )({
 	loader: ({ context, params }) =>
-		context.queryClient.ensureQueryData(
-			mentorshipStudentOverviewQueryOptions(params.id),
-		),
+		Promise.all([
+			context.queryClient.ensureQueryData(
+				mentorshipStudentOverviewQueryOptions(params.id),
+			),
+			context.queryClient.ensureQueryData(lecturerMentorshipsQueryOptions),
+		]),
 	component: () => <LecturerStudentLayout />,
 });
 

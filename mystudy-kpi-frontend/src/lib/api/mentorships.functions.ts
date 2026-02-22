@@ -1,7 +1,11 @@
 import { createServerFn } from "@tanstack/react-start";
 import { getCookie, getRequestUrl } from "@tanstack/react-start/server";
-import ky from "ky";
 import { z } from "zod";
+import { academicListParamsSchema } from "./academic-list-params";
+import { challengeListParamsSchema } from "./challenge-list-params";
+import { kpiRecordListParamsSchema } from "./kpi-record-list-params";
+import { mentorshipListParamsSchema } from "./mentorship-list-params";
+import type { PaginatedResponse } from "./server-function-types";
 import type { AcademicRecord } from "./academics.functions";
 import type { Challenge } from "./challenges.functions";
 import type {
@@ -11,6 +15,7 @@ import type {
 } from "./kpi-aim.functions";
 import type { KpiRecord } from "./kpi-records.functions";
 import type { KpiSummaryResponse } from "./kpi-summary.functions";
+import ky from "./ky";
 import {
 	positiveIntSchema,
 	saveKpiAimPayloadSchema,
@@ -101,6 +106,53 @@ export const getAdminMentorshipsFn = createServerFn({
 		.json<Mentorship[]>();
 });
 
+export const getLecturerMentorshipsPageFn = createServerFn({ method: "GET" })
+	.inputValidator((params: unknown) => mentorshipListParamsSchema.parse(params))
+	.handler(async ({ data: params }) => {
+		const authToken = getCookie("AUTH_TOKEN");
+		const searchParams: Record<string, string> = {
+			page: String(params.page),
+			limit: String(params.limit),
+		};
+		if (params.sortBy) searchParams.sortBy = params.sortBy;
+		if (params.sortDir) searchParams.sortDir = params.sortDir;
+		if (params.startYear) searchParams.startYear = String(params.startYear);
+
+		return await ky
+			.get(`${getApiBaseUrl()}/api/lecturer/mentorships/page`, {
+				searchParams,
+				headers: {
+					Accept: "application/json",
+					Cookie: `AUTH_TOKEN=${authToken}`,
+				},
+			})
+			.json<PaginatedResponse<Mentorship>>();
+	});
+
+export const getAdminMentorshipsPageFn = createServerFn({ method: "GET" })
+	.inputValidator((params: unknown) => mentorshipListParamsSchema.parse(params))
+	.handler(async ({ data: params }) => {
+		const authToken = getCookie("AUTH_TOKEN");
+		const searchParams: Record<string, string> = {
+			page: String(params.page),
+			limit: String(params.limit),
+		};
+		if (params.sortBy) searchParams.sortBy = params.sortBy;
+		if (params.sortDir) searchParams.sortDir = params.sortDir;
+		if (params.startYear) searchParams.startYear = String(params.startYear);
+		if (params.lecturerId) searchParams.lecturerId = params.lecturerId;
+
+		return await ky
+			.get(`${getApiBaseUrl()}/api/admin/mentorships/page`, {
+				searchParams,
+				headers: {
+					Accept: "application/json",
+					Cookie: `AUTH_TOKEN=${authToken}`,
+				},
+			})
+			.json<PaginatedResponse<Mentorship>>();
+	});
+
 export const getAdminMentorshipByIdFn = createServerFn({
 	method: "GET",
 })
@@ -178,6 +230,33 @@ export const getMentorshipStudentAcademicsFn = createServerFn({
 			.json<AcademicRecord[]>();
 	});
 
+export const getMentorshipStudentAcademicsSortedFn = createServerFn({
+	method: "GET",
+})
+	.inputValidator((data: unknown) =>
+		academicListParamsSchema.extend({ id: uuidSchema }).parse(data),
+	)
+	.handler(async ({ data: { id, ...params } }) => {
+		const authToken = getCookie("AUTH_TOKEN");
+		const searchParams: Record<string, string> = {};
+		if (params.sortBy) searchParams.sortBy = params.sortBy;
+		if (params.sortDir) searchParams.sortDir = params.sortDir;
+		if (params.semester) searchParams.semester = String(params.semester);
+
+		return await ky
+			.get(
+				`${getApiBaseUrl()}/api/lecturer/mentorships/students/${id}/academics`,
+				{
+					searchParams,
+					headers: {
+						Accept: "application/json",
+						Cookie: `AUTH_TOKEN=${authToken}`,
+					},
+				},
+			)
+			.json<AcademicRecord[]>();
+	});
+
 export const getMentorshipStudentKpiRecordsFn = createServerFn({
 	method: "GET",
 })
@@ -197,6 +276,36 @@ export const getMentorshipStudentKpiRecordsFn = createServerFn({
 			.json<KpiRecord[]>();
 	});
 
+export const getMentorshipStudentKpiRecordsPageFn = createServerFn({
+	method: "GET",
+})
+	.inputValidator((data: unknown) =>
+		kpiRecordListParamsSchema.extend({ id: uuidSchema }).parse(data),
+	)
+	.handler(async ({ data: { id, ...params } }) => {
+		const authToken = getCookie("AUTH_TOKEN");
+		const searchParams: Record<string, string> = {
+			page: String(params.page),
+			limit: String(params.limit),
+		};
+		if (params.sortBy) searchParams.sortBy = params.sortBy;
+		if (params.sortDir) searchParams.sortDir = params.sortDir;
+		if (params.type) searchParams.type = params.type;
+
+		return await ky
+			.get(
+				`${getApiBaseUrl()}/api/lecturer/mentorships/students/${id}/kpi-records/page`,
+				{
+					searchParams,
+					headers: {
+						Accept: "application/json",
+						Cookie: `AUTH_TOKEN=${authToken}`,
+					},
+				},
+			)
+			.json<PaginatedResponse<KpiRecord>>();
+	});
+
 export const getMentorshipStudentChallengesFn = createServerFn({
 	method: "GET",
 })
@@ -214,6 +323,36 @@ export const getMentorshipStudentChallengesFn = createServerFn({
 				},
 			)
 			.json<Challenge[]>();
+	});
+
+export const getMentorshipStudentChallengesPageFn = createServerFn({
+	method: "GET",
+})
+	.inputValidator((data: unknown) =>
+		challengeListParamsSchema.extend({ id: uuidSchema }).parse(data),
+	)
+	.handler(async ({ data: { id, ...params } }) => {
+		const authToken = getCookie("AUTH_TOKEN");
+		const searchParams: Record<string, string> = {
+			page: String(params.page),
+			limit: String(params.limit),
+		};
+		if (params.sortBy) searchParams.sortBy = params.sortBy;
+		if (params.sortDir) searchParams.sortDir = params.sortDir;
+		if (params.semester) searchParams.semester = String(params.semester);
+
+		return await ky
+			.get(
+				`${getApiBaseUrl()}/api/lecturer/mentorships/students/${id}/challenges/page`,
+				{
+					searchParams,
+					headers: {
+						Accept: "application/json",
+						Cookie: `AUTH_TOKEN=${authToken}`,
+					},
+				},
+			)
+			.json<PaginatedResponse<Challenge>>();
 	});
 
 export const getMentorshipStudentKpiTargetFn = createServerFn({

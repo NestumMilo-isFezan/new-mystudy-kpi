@@ -1,6 +1,8 @@
 import { createServerFn } from "@tanstack/react-start";
 import { getCookie, getRequestUrl } from "@tanstack/react-start/server";
-import ky from "ky";
+import { kpiRecordListParamsSchema } from "./kpi-record-list-params";
+import ky from "./ky";
+import type { PaginatedResponse } from "./server-function-types";
 
 export type KpiRecord = {
 	id: number;
@@ -55,6 +57,30 @@ export const getKpiRecordsFn = createServerFn({ method: "GET" }).handler(
 			.json<KpiRecord[]>();
 	},
 );
+
+export const getKpiRecordsPageFn = createServerFn({ method: "GET" })
+	.inputValidator((params: unknown) => kpiRecordListParamsSchema.parse(params))
+	.handler(async ({ data: params }) => {
+		const authToken = getCookie("AUTH_TOKEN");
+
+		const searchParams: Record<string, string> = {
+			page: String(params.page),
+			limit: String(params.limit),
+		};
+		if (params.sortBy) searchParams.sortBy = params.sortBy;
+		if (params.sortDir) searchParams.sortDir = params.sortDir;
+		if (params.type) searchParams.type = params.type;
+
+		return await ky
+			.get(`${getApiBaseUrl()}/api/student/kpi-records/page`, {
+				searchParams,
+				headers: {
+					Accept: "application/json",
+					Cookie: `AUTH_TOKEN=${authToken}`,
+				},
+			})
+			.json<PaginatedResponse<KpiRecord>>();
+	});
 
 export const createKpiRecordFn = createServerFn({ method: "POST" })
 	.inputValidator((data: SaveKpiRecordPayload) => data)

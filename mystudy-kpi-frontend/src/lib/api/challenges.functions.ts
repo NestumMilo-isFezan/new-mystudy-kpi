@@ -1,6 +1,8 @@
 import { createServerFn } from "@tanstack/react-start";
 import { getCookie, getRequestUrl } from "@tanstack/react-start/server";
-import ky from "ky";
+import { challengeListParamsSchema } from "./challenge-list-params";
+import ky from "./ky";
+import type { PaginatedResponse } from "./server-function-types";
 
 export type Challenge = {
 	id: number;
@@ -47,6 +49,30 @@ export const getChallengesFn = createServerFn({ method: "GET" }).handler(
 			.json<Challenge[]>();
 	},
 );
+
+export const getChallengesPageFn = createServerFn({ method: "GET" })
+	.inputValidator((params: unknown) => challengeListParamsSchema.parse(params))
+	.handler(async ({ data: params }) => {
+		const authToken = getCookie("AUTH_TOKEN");
+
+		const searchParams: Record<string, string> = {
+			page: String(params.page),
+			limit: String(params.limit),
+		};
+		if (params.sortBy) searchParams.sortBy = params.sortBy;
+		if (params.sortDir) searchParams.sortDir = params.sortDir;
+		if (params.semester) searchParams.semester = String(params.semester);
+
+		return await ky
+			.get(`${getApiBaseUrl()}/api/student/challenges/page`, {
+				searchParams,
+				headers: {
+					Accept: "application/json",
+					Cookie: `AUTH_TOKEN=${authToken}`,
+				},
+			})
+			.json<PaginatedResponse<Challenge>>();
+	});
 
 export const createChallengeFn = createServerFn({ method: "POST" })
 	.inputValidator((data: SaveChallengePayload) => data)

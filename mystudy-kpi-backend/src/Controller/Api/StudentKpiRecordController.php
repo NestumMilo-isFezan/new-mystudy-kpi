@@ -8,8 +8,10 @@ use App\Dto\KpiRecordDto;
 use App\Entity\User;
 use App\Serializer\KpiRecordResponseSerializer;
 use App\Service\KpiRecordService;
+use App\Service\PaginationService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -20,6 +22,7 @@ class StudentKpiRecordController extends AbstractController
 {
     public function __construct(
         private readonly KpiRecordService $kpiRecordService,
+        private readonly PaginationService $paginationService,
         private readonly KpiRecordResponseSerializer $serializer,
     ) {
     }
@@ -32,6 +35,36 @@ class StudentKpiRecordController extends AbstractController
         $records = $this->kpiRecordService->listRecords($user);
 
         return $this->json($this->serializer->serializeCollection($records));
+    }
+
+    #[Route('/page', name: 'api_student_kpi_records_page', methods: ['GET'])]
+    public function listPage(Request $request): JsonResponse
+    {
+        /** @var User $user */
+        $user = $this->getUser();
+
+        $pagination = $this->paginationService->resolve($request);
+        $sort = $this->paginationService->resolveKpiRecordSort($request);
+        $typeRaw = $this->paginationService->resolveFilter($request, 'type');
+        $type = in_array($typeRaw, ['activity', 'competition', 'certification'], true) ? $typeRaw : null;
+
+        $resultPage = $this->kpiRecordService->listRecordsPage(
+            $user,
+            $pagination['page'],
+            $pagination['limit'],
+            $sort['sortBy'],
+            $sort['sortDir'],
+            $type,
+        );
+
+        return $this->json([
+            'items' => $this->serializer->serializeCollection($resultPage['items']),
+            'pagination' => $this->paginationService->metadata(
+                $pagination['page'],
+                $pagination['limit'],
+                $resultPage['total'],
+            ),
+        ]);
     }
 
     #[Route('', name: 'api_student_kpi_records_create', methods: ['POST'])]

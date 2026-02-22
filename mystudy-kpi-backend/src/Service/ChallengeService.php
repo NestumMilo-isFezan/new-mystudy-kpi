@@ -7,6 +7,8 @@ namespace App\Service;
 use App\Dto\ChallengeDto;
 use App\Entity\Challenge;
 use App\Entity\User;
+use App\Enum\SortableChallengeColumn;
+use App\Exception\NotFoundException;
 use App\Repository\ChallengeRepository;
 use App\Repository\SemesterRecordRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -28,6 +30,27 @@ class ChallengeService
         return $this->challengeRepository->findByStudent($student);
     }
 
+    /**
+     * @return array{items: Challenge[], total: int}
+     */
+    public function listChallengesPage(
+        User $student,
+        int $page,
+        int $limit,
+        SortableChallengeColumn $sortBy,
+        string $sortDir,
+        ?int $semester = null,
+    ): array {
+        return $this->challengeRepository->findByStudentPaginated(
+            $student,
+            $page,
+            $limit,
+            $sortBy,
+            $sortDir,
+            $semester,
+        );
+    }
+
     public function createChallenge(User $student, ChallengeDto $dto): Challenge
     {
         $record = $this->semesterRecordRepository->findOneBy([
@@ -36,7 +59,7 @@ class ChallengeService
         ]);
 
         if (null === $record) {
-            throw new \InvalidArgumentException('Semester record not found.');
+            throw new NotFoundException('Semester record not found.');
         }
 
         $challenge = (new Challenge())
@@ -56,7 +79,7 @@ class ChallengeService
         $challenge = $this->challengeRepository->find($id);
 
         if (null === $challenge || $challenge->getRecord()->getStudent() !== $student) {
-            throw new \InvalidArgumentException('Challenge not found.');
+            throw new NotFoundException('Challenge not found.');
         }
 
         $record = $this->semesterRecordRepository->findOneBy([
@@ -65,7 +88,7 @@ class ChallengeService
         ]);
 
         if (null === $record) {
-            throw new \InvalidArgumentException('Semester record not found.');
+            throw new NotFoundException('Semester record not found.');
         }
 
         $challenge
@@ -84,7 +107,7 @@ class ChallengeService
         $challenge = $this->challengeRepository->find($id);
 
         if (null === $challenge || $challenge->getRecord()->getStudent() !== $student) {
-            throw new \InvalidArgumentException('Challenge not found.');
+            throw new NotFoundException('Challenge not found.');
         }
 
         $this->entityManager->remove($challenge);

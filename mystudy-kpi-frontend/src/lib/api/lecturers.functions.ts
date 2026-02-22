@@ -1,6 +1,10 @@
 import { createServerFn } from "@tanstack/react-start";
 import { getCookie, getRequestUrl } from "@tanstack/react-start/server";
-import ky from "ky";
+import { listParamsSchema } from "./list-params";
+import ky from "./ky";
+import type {
+	PaginatedResponse,
+} from "./server-function-types";
 
 export type Lecturer = {
 	id: string;
@@ -40,7 +44,7 @@ export const getAllLecturersFn = createServerFn({ method: "GET" }).handler(
 	async () => {
 		const authToken = getCookie("AUTH_TOKEN");
 		return await ky
-			.get(`${getApiBaseUrl()}/api/admin/lecturers`, {
+			.get(`${getApiBaseUrl()}/api/admin/lecturers/all`, {
 				headers: {
 					Accept: "application/json",
 					Cookie: `AUTH_TOKEN=${authToken}`,
@@ -49,6 +53,27 @@ export const getAllLecturersFn = createServerFn({ method: "GET" }).handler(
 			.json<Lecturer[]>();
 	},
 );
+
+export const getLecturersPageFn = createServerFn({ method: "GET" })
+	.inputValidator((params: unknown) => listParamsSchema.parse(params))
+	.handler(async ({ data: params }) => {
+		const authToken = getCookie("AUTH_TOKEN");
+		const searchParams: Record<string, string> = {
+			page: String(params.page),
+			limit: String(params.limit),
+		};
+		if (params.sortBy) searchParams.sortBy = params.sortBy;
+		if (params.sortDir) searchParams.sortDir = params.sortDir;
+		return await ky
+			.get(`${getApiBaseUrl()}/api/admin/lecturers`, {
+				searchParams,
+				headers: {
+					Accept: "application/json",
+					Cookie: `AUTH_TOKEN=${authToken}`,
+				},
+			})
+			.json<PaginatedResponse<Lecturer>>();
+	});
 
 export const createLecturerFn = createServerFn({ method: "POST" })
 	.inputValidator((data: LecturerCreateInput) => data)

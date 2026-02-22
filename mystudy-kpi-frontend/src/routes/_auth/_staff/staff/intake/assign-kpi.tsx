@@ -118,7 +118,9 @@ function ManageStandardKpiAimsPage() {
 				<Button
 					type="button"
 					variant="outline"
-					onClick={() => navigate({ to: "/staff/intake" })}
+					onClick={() =>
+						navigate({ to: "/staff/intake", search: { page: 1, limit: 25 } })
+					}
 					className="w-full md:w-auto"
 				>
 					<ChevronLeft className="mr-2 size-4" />

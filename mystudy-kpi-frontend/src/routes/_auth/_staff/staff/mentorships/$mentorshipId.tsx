@@ -14,7 +14,10 @@ export const Route = createFileRoute(
 			);
 		} catch (error) {
 			if (error instanceof Error && error.message.includes("404 Not Found")) {
-				throw redirect({ to: "/staff/mentorships" });
+				throw redirect({
+					to: "/staff/mentorships",
+					search: { page: 1, limit: 25 },
+				});
 			}
 			throw error;
 		}

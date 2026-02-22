@@ -20,12 +20,32 @@ import {
 } from "react";
 import type { TableControlConfig } from "@/components/table/core/table-config";
 import { useIsMobile } from "@/hooks/use-mobile";
+import type { PaginationMeta } from "@/lib/api/server-function-types";
+
+export type ServerPaginationProps = {
+	meta: PaginationMeta;
+	page: number;
+	onPageChange: (page: number) => void;
+};
+
+export type ServerControlCallbacks = {
+	/** Called when sort column or direction changes. Empty strings mean "clear sort". */
+	onSortChange?: (columnId: string, direction: "asc" | "desc" | "") => void;
+	/** Called when a filter dropdown value changes. Empty string means "clear filter". */
+	onFilterChange?: (columnId: string, value: string) => void;
+};
 
 type UseTableControlOptions<TData> = {
 	data: TData[];
 	columns: ColumnDef<TData, unknown>[];
 	config: TableControlConfig;
 	isMobile: boolean;
+	serverPagination?: ServerPaginationProps;
+	serverCallbacks?: ServerControlCallbacks;
+	/** Initial column filter state derived from URL search params. Kept in sync on navigation. */
+	initialColumnFilters?: ColumnFiltersState;
+	/** Initial sorting state derived from URL search params. Kept in sync on navigation. */
+	initialSorting?: SortingState;
 };
 
 type TableControlState<TData> = ReturnType<typeof useTableControl<TData>>;
@@ -54,6 +74,10 @@ export function useTableControl<TData>({
 	columns,
 	config,
 	isMobile,
+	serverPagination,
+	serverCallbacks,
+	initialColumnFilters,
+	initialSorting,
 }: UseTableControlOptions<TData>) {
 	const defaultVisibility = useMemo(
 		() => buildDefaultVisibility(config),
@@ -61,11 +85,22 @@ export function useTableControl<TData>({
 	);
 
 	const [query, setQuery] = useState("");
-	const [sorting, setSorting] = useState<SortingState>([]);
-	const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+	const [sorting, setSorting] = useState<SortingState>(initialSorting ?? []);
+	const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>(
+		initialColumnFilters ?? [],
+	);
 	const [columnVisibility, setColumnVisibility] =
 		useState<VisibilityState>(defaultVisibility);
 	const [expanded, setExpanded] = useState<ExpandedState>({});
+
+	// Sync filter/sort state when URL-derived initial values change (e.g. back/forward navigation)
+	useEffect(() => {
+		setColumnFilters(initialColumnFilters ?? []);
+	}, [initialColumnFilters]);
+
+	useEffect(() => {
+		setSorting(initialSorting ?? []);
+	}, [initialSorting]);
 
 	useEffect(() => {
 		setColumnVisibility(buildDefaultVisibility(config));
@@ -170,6 +205,9 @@ export function useTableControl<TData>({
 		table
 			.getColumn(columnId)
 			?.setFilterValue(nextValue.length > 0 ? nextValue : undefined);
+
+		// Notify server callbacks if provided (resets page to 1 externally)
+		serverCallbacks?.onFilterChange?.(columnId, nextValue);
 	}
 
 	function getFilterValue(columnId: string) {
@@ -179,10 +217,14 @@ export function useTableControl<TData>({
 	function setSort(columnId: string, direction: "asc" | "desc" | "") {
 		if (!columnId || !direction) {
 			setSorting([]);
+			// Notify server callbacks to clear sort
+			serverCallbacks?.onSortChange?.("", "");
 			return;
 		}
 
 		setSorting([{ id: columnId, desc: direction === "desc" }]);
+		// Notify server callbacks to apply server-side sort
+		serverCallbacks?.onSortChange?.(columnId, direction);
 	}
 
 	function toggleColumn(columnId: string, visible: boolean) {
@@ -202,12 +244,25 @@ export function useTableControl<TData>({
 		setColumnFilters([]);
 		setSorting([]);
 		resetColumnsToDefault();
+		// Notify server callbacks to clear sort + filters
+		serverCallbacks?.onSortChange?.("", "");
+		if (config.filters) {
+			for (const filter of config.filters) {
+				serverCallbacks?.onFilterChange?.(filter.columnId, "");
+			}
+		}
 	}
 
 	function clearMobileControls() {
 		setQuery("");
 		setColumnFilters([]);
 		setSorting([]);
+		serverCallbacks?.onSortChange?.("", "");
+		if (config.filters) {
+			for (const filter of config.filters) {
+				serverCallbacks?.onFilterChange?.(filter.columnId, "");
+			}
+		}
 	}
 
 	const hideableColumns = config.columns.filter((columnConfig) => {
@@ -233,6 +288,7 @@ export function useTableControl<TData>({
 		appliedMobileCount,
 		clearDesktopControls,
 		clearMobileControls,
+		serverPagination,
 	};
 }
 
@@ -241,6 +297,12 @@ type TableControlProps<TData> = {
 	columns: ColumnDef<TData, unknown>[];
 	config: TableControlConfig;
 	children: ReactNode;
+	serverPagination?: ServerPaginationProps;
+	serverCallbacks?: ServerControlCallbacks;
+	/** Initial column filter state derived from URL search params. Kept in sync on navigation. */
+	initialColumnFilters?: ColumnFiltersState;
+	/** Initial sorting state derived from URL search params. Kept in sync on navigation. */
+	initialSorting?: SortingState;
 };
 
 export function TableControl<TData>({
@@ -248,9 +310,22 @@ export function TableControl<TData>({
 	columns,
 	config,
 	children,
+	serverPagination,
+	serverCallbacks,
+	initialColumnFilters,
+	initialSorting,
 }: TableControlProps<TData>) {
 	const isMobile = useIsMobile();
-	const controls = useTableControl({ data, columns, config, isMobile });
+	const controls = useTableControl({
+		data,
+		columns,
+		config,
+		isMobile,
+		serverPagination,
+		serverCallbacks,
+		initialColumnFilters,
+		initialSorting,
+	});
 
 	return (
 		<TableControlContext.Provider
@@ -260,3 +335,4 @@ export function TableControl<TData>({
 		</TableControlContext.Provider>
 	);
 }
+

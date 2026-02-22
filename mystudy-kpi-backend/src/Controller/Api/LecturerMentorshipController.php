@@ -11,9 +11,11 @@ use App\Serializer\MentorshipResponseSerializer;
 use App\Serializer\UserResponseSerializer;
 use App\Service\AdminUserService;
 use App\Service\MentorshipService;
+use App\Service\PaginationService;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -25,6 +27,7 @@ class LecturerMentorshipController extends AbstractController
     public function __construct(
         private readonly MentorshipService $mentorshipService,
         private readonly AdminUserService $adminUserService,
+        private readonly PaginationService $paginationService,
         private readonly MentorshipResponseSerializer $mentorshipSerializer,
         private readonly UserResponseSerializer $userSerializer,
     ) {
@@ -50,6 +53,48 @@ class LecturerMentorshipController extends AbstractController
         }
 
         return $this->json($result);
+    }
+
+    #[Route('/page', name: 'api_lecturer_mentorships_page', methods: ['GET'])]
+    public function listPage(Request $request): JsonResponse
+    {
+        /** @var User $lecturer */
+        $lecturer = $this->getUser();
+        if (!$lecturer instanceof User) {
+            return $this->json(['message' => 'Unauthorized.'], JsonResponse::HTTP_UNAUTHORIZED);
+        }
+
+        $pagination = $this->paginationService->resolve($request);
+        $sort = $this->paginationService->resolveMentorshipSort($request);
+        $startYearRaw = $this->paginationService->resolveFilter($request, 'startYear');
+        $startYear = $startYearRaw !== null ? (int) $startYearRaw : null;
+
+        $page = $this->mentorshipService->findByLecturerPage(
+            $lecturer,
+            $pagination['page'],
+            $pagination['limit'],
+            $sort['sortBy'],
+            $sort['sortDir'],
+            $startYear,
+        );
+
+        $items = [];
+        foreach ($page['items'] as $row) {
+            $items[] = $this->mentorshipSerializer->serialize(
+                $row['mentorship'],
+                $row['mentees'],
+                $row['menteeCount'],
+            );
+        }
+
+        return $this->json([
+            'items' => $items,
+            'pagination' => $this->paginationService->metadata(
+                $pagination['page'],
+                $pagination['limit'],
+                $page['total'],
+            ),
+        ]);
     }
 
     #[Route('/{id}', name: 'api_lecturer_mentorships_show', methods: ['GET'])]

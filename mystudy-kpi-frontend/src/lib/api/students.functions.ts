@@ -1,11 +1,19 @@
 import { createServerFn } from "@tanstack/react-start";
 import { getCookie, getRequestUrl } from "@tanstack/react-start/server";
-import ky from "ky";
+import { z } from "zod";
 import type { AcademicRecord } from "./academics.functions";
+import { academicListParamsSchema } from "./academic-list-params";
+import { challengeListParamsSchema } from "./challenge-list-params";
 import type { Challenge } from "./challenges.functions";
 import type { KpiAimResponse } from "./kpi-aim.functions";
+import { kpiRecordListParamsSchema } from "./kpi-record-list-params";
 import type { KpiRecord } from "./kpi-records.functions";
 import type { KpiSummaryResponse } from "./kpi-summary.functions";
+import { listParamsSchema } from "./list-params";
+import ky from "./ky";
+import type {
+	PaginatedResponse,
+} from "./server-function-types";
 
 export type Student = {
 	id: string;
@@ -51,19 +59,27 @@ function getApiBaseUrl() {
 	return getRequestUrl().origin;
 }
 
-export const getAllStudentsFn = createServerFn({ method: "GET" }).handler(
-	async () => {
+export const getStudentsPageFn = createServerFn({ method: "GET" })
+	.inputValidator((params: unknown) => listParamsSchema.parse(params))
+	.handler(async ({ data: params }) => {
 		const authToken = getCookie("AUTH_TOKEN");
+		const searchParams: Record<string, string> = {
+			page: String(params.page),
+			limit: String(params.limit),
+		};
+		if (params.sortBy) searchParams.sortBy = params.sortBy;
+		if (params.sortDir) searchParams.sortDir = params.sortDir;
+		if (params.startYear) searchParams.startYear = String(params.startYear);
 		return await ky
 			.get(`${getApiBaseUrl()}/api/admin/students`, {
+				searchParams,
 				headers: {
 					Accept: "application/json",
 					Cookie: `AUTH_TOKEN=${authToken}`,
 				},
 			})
-			.json<Student[]>();
-	},
-);
+			.json<PaginatedResponse<Student>>();
+	});
 
 export const getAdminStudentOverviewFn = createServerFn({
 	method: "GET",
@@ -97,6 +113,30 @@ export const getAdminStudentAcademicsFn = createServerFn({
 			.json<AcademicRecord[]>();
 	});
 
+export const getAdminStudentAcademicsSortedFn = createServerFn({
+	method: "GET",
+})
+	.inputValidator((data: unknown) =>
+		academicListParamsSchema.extend({ id: z.string().uuid() }).parse(data),
+	)
+	.handler(async ({ data: { id, ...params } }) => {
+		const authToken = getCookie("AUTH_TOKEN");
+		const searchParams: Record<string, string> = {};
+		if (params.sortBy) searchParams.sortBy = params.sortBy;
+		if (params.sortDir) searchParams.sortDir = params.sortDir;
+		if (params.semester) searchParams.semester = String(params.semester);
+
+		return await ky
+			.get(`${getApiBaseUrl()}/api/admin/students/${id}/academics`, {
+				searchParams,
+				headers: {
+					Accept: "application/json",
+					Cookie: `AUTH_TOKEN=${authToken}`,
+				},
+			})
+			.json<AcademicRecord[]>();
+	});
+
 export const getAdminStudentKpiRecordsFn = createServerFn({
 	method: "GET",
 })
@@ -113,6 +153,32 @@ export const getAdminStudentKpiRecordsFn = createServerFn({
 			.json<KpiRecord[]>();
 	});
 
+export const getAdminStudentKpiRecordsPageFn = createServerFn({
+	method: "GET",
+})
+	.inputValidator((data: unknown) =>
+		kpiRecordListParamsSchema.extend({ id: z.string().uuid() }).parse(data),
+	)
+	.handler(async ({ data: { id, ...params } }) => {
+		const authToken = getCookie("AUTH_TOKEN");
+		const searchParams: Record<string, string> = {
+			page: String(params.page),
+			limit: String(params.limit),
+		};
+		if (params.sortBy) searchParams.sortBy = params.sortBy;
+		if (params.sortDir) searchParams.sortDir = params.sortDir;
+		if (params.type) searchParams.type = params.type;
+		return await ky
+			.get(`${getApiBaseUrl()}/api/admin/students/${id}/kpi-records/page`, {
+				searchParams,
+				headers: {
+					Accept: "application/json",
+					Cookie: `AUTH_TOKEN=${authToken}`,
+				},
+			})
+			.json<PaginatedResponse<KpiRecord>>();
+	});
+
 export const getAdminStudentChallengesFn = createServerFn({
 	method: "GET",
 })
@@ -127,6 +193,33 @@ export const getAdminStudentChallengesFn = createServerFn({
 				},
 			})
 			.json<Challenge[]>();
+	});
+
+export const getAdminStudentChallengesPageFn = createServerFn({
+	method: "GET",
+})
+	.inputValidator((data: unknown) =>
+		challengeListParamsSchema.extend({ id: z.string().uuid() }).parse(data),
+	)
+	.handler(async ({ data: { id, ...params } }) => {
+		const authToken = getCookie("AUTH_TOKEN");
+		const searchParams: Record<string, string> = {
+			page: String(params.page),
+			limit: String(params.limit),
+		};
+		if (params.sortBy) searchParams.sortBy = params.sortBy;
+		if (params.sortDir) searchParams.sortDir = params.sortDir;
+		if (params.semester) searchParams.semester = String(params.semester);
+
+		return await ky
+			.get(`${getApiBaseUrl()}/api/admin/students/${id}/challenges/page`, {
+				searchParams,
+				headers: {
+					Accept: "application/json",
+					Cookie: `AUTH_TOKEN=${authToken}`,
+				},
+			})
+			.json<PaginatedResponse<Challenge>>();
 	});
 
 export const getAdminStudentKpiTargetFn = createServerFn({

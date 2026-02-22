@@ -33,6 +33,15 @@ export const getChallengeTableColumns = (
 		meta: { hideable: false },
 	},
 	{
+		id: "semesterNumber",
+		accessorFn: (row) => row.semester.semester,
+		filterFn: "selectEquals",
+		header: () => <HeaderCell>Semester Number</HeaderCell>,
+		cell: ({ row }) => <DataCell value={row.original.semester.semester} />,
+		enableSorting: false,
+		meta: { hideable: true },
+	},
+	{
 		id: "challenge",
 		accessorKey: "challenge",
 		header: ({ column }) => <SortCell column={column} label="Challenge" />,

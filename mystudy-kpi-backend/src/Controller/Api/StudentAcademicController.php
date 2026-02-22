@@ -9,8 +9,10 @@ use App\Dto\SemesterRecordDto;
 use App\Entity\User;
 use App\Serializer\AcademicResponseSerializer;
 use App\Service\AcademicService;
+use App\Service\PaginationService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -21,16 +23,25 @@ class StudentAcademicController extends AbstractController
 {
     public function __construct(
         private readonly AcademicService $academicService,
+        private readonly PaginationService $paginationService,
         private readonly AcademicResponseSerializer $serializer,
     ) {
     }
 
     #[Route('', name: 'api_student_academics_list', methods: ['GET'])]
-    public function list(): JsonResponse
+    public function list(Request $request): JsonResponse
     {
         /** @var User $user */
         $user = $this->getUser();
-        $records = $this->academicService->listRecords($user);
+        $sort = $this->paginationService->resolveAcademicSort($request);
+        $semesterRaw = $this->paginationService->resolveFilter($request, 'semester');
+        $semester = $semesterRaw !== null ? (int) $semesterRaw : null;
+        $records = $this->academicService->listRecordsSortedFiltered(
+            $user,
+            $sort['sortBy'],
+            $sort['sortDir'],
+            $semester,
+        );
 
         return $this->json($this->serializer->serializeCollection($records));
     }

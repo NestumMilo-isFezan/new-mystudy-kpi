@@ -1,15 +1,23 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { AcademicsTable } from "@/components/pages/manage-academics/academics-table";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { AcademicsSortedTable } from "@/components/pages/manage-academics/academics-sorted-table";
 import type { AcademicRecord } from "@/lib/api/academics.functions";
-import { adminStudentAcademicsQueryOptions } from "@/lib/api/students-query";
+import type { AcademicListSearch } from "@/lib/api/academic-list-params";
+import { academicListSearchSchema } from "@/lib/api/academic-list-params";
+import { mapAcademicSortColumn } from "@/lib/api/sort-mappers";
+import { adminStudentAcademicsSortedQueryOptions } from "@/lib/api/students-query";
 
 export const Route = createFileRoute(
 	"/_auth/_staff/staff/students/$id/academics",
 )({
-	loader: ({ context, params }) =>
-		context.queryClient.ensureQueryData(
-			adminStudentAcademicsQueryOptions(params.id),
-		),
+	validateSearch: (search) => academicListSearchSchema.parse(search),
+	loader: ({ context, params, location }) => {
+		const search = academicListSearchSchema.parse(
+			Object.fromEntries(new URLSearchParams(location.search)),
+		);
+		return context.queryClient.ensureQueryData(
+			adminStudentAcademicsSortedQueryOptions(params.id, search),
+		);
+	},
 	component: AdminStudentAcademicsPage,
 });
 
@@ -28,12 +36,47 @@ function StaffAcademicActionGroup(_props: ActionGroupProps) {
 
 function AdminStudentAcademicsPage() {
 	const { id } = Route.useParams();
+	const search = Route.useSearch();
+	const navigate = useNavigate({ from: Route.fullPath });
+
+	const params = {
+		sortBy: search.sortBy,
+		sortDir: search.sortDir,
+		semester: search.semester,
+	};
+
+	const handleSortChange = (
+		columnId: string,
+		direction: "asc" | "desc" | "",
+	) => {
+		const sortBy = mapAcademicSortColumn(columnId);
+		navigate({
+			search: (prev: AcademicListSearch) => ({
+				...prev,
+				sortBy: sortBy && direction ? sortBy : undefined,
+				sortDir: direction || undefined,
+			}),
+		});
+	};
+
+	const handleFilterChange = (columnId: string, value: string) => {
+		if (columnId !== "semester") return;
+		navigate({
+			search: (prev: AcademicListSearch) => ({
+				...prev,
+				semester: value ? Number(value) : undefined,
+			}),
+		});
+	};
 
 	return (
 		<div className="space-y-6">
-			<AcademicsTable
+			<AcademicsSortedTable
 				ActionGroup={StaffAcademicActionGroup}
-				queryOptions={adminStudentAcademicsQueryOptions(id)}
+				queryOptions={adminStudentAcademicsSortedQueryOptions(id, params)}
+				params={params}
+				onSortChange={handleSortChange}
+				onFilterChange={handleFilterChange}
 			/>
 		</div>
 	);

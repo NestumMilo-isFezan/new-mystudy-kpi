@@ -4,12 +4,17 @@ import { StudentHeader } from "@/components/pages/manage-student/student-header"
 import { StudentTable } from "@/components/pages/manage-student/student-table";
 import { StudentTableSkeleton } from "@/components/pages/manage-student/student-table-skeleton";
 import { allIntakeBatchesQueryOptions } from "@/lib/api/intake-batches-query";
-import { allStudentsQueryOptions } from "@/lib/api/students-query";
+import { paginatedListSearchSchema } from "@/lib/api/list-params";
+import { studentsPageQueryOptions } from "@/lib/api/students-query";
 
 export const Route = createFileRoute("/_auth/_staff/staff/students/")({
-	loader: async ({ context }) => {
+	validateSearch: (search) => paginatedListSearchSchema.parse(search),
+	loader: async ({ context, location }) => {
+		const search = paginatedListSearchSchema.parse(
+			Object.fromEntries(new URLSearchParams(location.search)),
+		);
 		await Promise.all([
-			context.queryClient.ensureQueryData(allStudentsQueryOptions),
+			context.queryClient.ensureQueryData(studentsPageQueryOptions(search)),
 			context.queryClient.ensureQueryData(allIntakeBatchesQueryOptions),
 		]);
 	},

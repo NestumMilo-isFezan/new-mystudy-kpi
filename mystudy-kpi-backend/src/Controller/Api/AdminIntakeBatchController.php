@@ -6,8 +6,10 @@ namespace App\Controller\Api;
 
 use App\Dto\IntakeBatchCreateDto;
 use App\Service\IntakeBatchService;
+use App\Service\PaginationService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -18,6 +20,7 @@ class AdminIntakeBatchController extends AbstractController
 {
     public function __construct(
         private readonly IntakeBatchService $intakeBatchService,
+        private readonly PaginationService $paginationService,
     ) {
     }
 
@@ -37,6 +40,42 @@ class AdminIntakeBatchController extends AbstractController
         }
 
         return $this->json($result);
+    }
+
+    #[Route('/intake-batches/page', name: 'api_admin_intake_batches_page', methods: ['GET'])]
+    public function listPage(Request $request): JsonResponse
+    {
+        $pagination = $this->paginationService->resolve($request);
+        $sort = $this->paginationService->resolveIntakeSort($request);
+        $status = $this->paginationService->resolveFilter($request, 'status');
+        $isActive = $status === 'active' ? true : ($status === 'inactive' ? false : null);
+
+        $resultPage = $this->intakeBatchService->findBatchesPage(
+            $pagination['page'],
+            $pagination['limit'],
+            $sort['sortBy'],
+            $sort['sortDir'],
+            $isActive,
+        );
+
+        $result = [];
+        foreach ($resultPage['items'] as $batch) {
+            $result[] = [
+                'id' => $batch->getId(),
+                'name' => $batch->getName(),
+                'startYear' => $batch->getStartYear(),
+                'isActive' => $batch->isActive(),
+            ];
+        }
+
+        return $this->json([
+            'items' => $result,
+            'pagination' => $this->paginationService->metadata(
+                $pagination['page'],
+                $pagination['limit'],
+                $resultPage['total'],
+            ),
+        ]);
     }
 
     #[Route('/intake-batches', name: 'api_admin_intake_batches_create', methods: ['POST'])]
